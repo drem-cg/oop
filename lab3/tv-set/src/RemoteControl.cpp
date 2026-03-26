@@ -124,6 +124,7 @@ bool RemoteControl::SelectChannel(std::istream& args) const
 	}
 	catch (...)
 	{
+		// TODO: разобраться с throw
 	}
 	std::string fullName = arg;
 	std::string rest;
@@ -148,7 +149,7 @@ bool RemoteControl::SelectPreviousChannel(std::istream&) const
 
 	return true;
 }
-
+// TODO: узнать надо ли bool или следует сделать итначе
 bool RemoteControl::SetChannelName(std::istream& args) const
 {
 	int channel;
@@ -195,7 +196,7 @@ bool RemoteControl::DeleteChannelName(std::istream& args) const
 		m_output << "Error: channel deleting error\n";
 	}
 
-	return true;
+	return false;
 }
 
 bool RemoteControl::GetChannelName(std::istream& args) const

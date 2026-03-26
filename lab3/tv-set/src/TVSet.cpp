@@ -102,13 +102,13 @@ bool TVSet::SetChannelName(const int channel, const std::string& name)
 {
 	if (!CheckPoweredOn() || !IsValidChannel(channel))
 	{
-		return false;
+		return true;
 	}
 
 	const std::string normalizedName = NormalizeName(name);
 	if (normalizedName.empty())
 	{
-		return false;
+		return true;
 	}
 
 	const auto entryName = m_nameToChannel.find(normalizedName);
@@ -128,7 +128,7 @@ bool TVSet::SetChannelName(const int channel, const std::string& name)
 	m_channelToName[channel] = normalizedName;
 	m_nameToChannel[normalizedName] = channel;
 
-	return true;
+	return false;
 }
 
 bool TVSet::DeleteChannelName(const std::string& name)

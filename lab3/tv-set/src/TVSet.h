@@ -3,7 +3,7 @@
 #include <optional>
 #include <string>
 #include <unordered_map>
-
+// TODO: разобраться со стрелкой в draw io и зависисостями между классами
 class TVSet
 {
 public:

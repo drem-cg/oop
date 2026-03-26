@@ -32,8 +32,10 @@ private:
 	using Handler = std::function<bool(std::istream&)>;
 	using ActionMap = std::map<std::string, Handler>;
 
+	// TODO провисший указатель
 	TVSet& m_tv;
 	std::istream& m_input;
+	// TODO ф-ция для вывода ошибок
 	std::ostream& m_output;
 	const ActionMap m_actionMap;
 };
