@@ -13,7 +13,7 @@ class CRemoteControl
 {
 public:
 	CRemoteControl(CTVSet& tv, std::istream& input, std::ostream& output);
-	bool HandleCommand() const;
+	[[nodiscard]] bool HandleCommand() const;
 
 private:
 	using ChannelList = std::vector<std::pair<int, std::string>>;
@@ -27,7 +27,7 @@ private:
 	bool GetChannelName(std::istream& args) const;
 	bool GetChannelByName(std::istream& args) const;
 
-	ChannelList GetSortedChannelNames() const;
+	[[nodiscard]] ChannelList GetSortedChannelNames() const;
 
 	using Handler = std::function<bool(std::istream&)>;
 	using ActionMap = std::map<std::string, Handler>;
