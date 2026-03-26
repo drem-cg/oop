@@ -79,7 +79,7 @@ CRemoteControl::ChannelList CRemoteControl::GetSortedChannelNames() const
 {
 	ChannelList result;
 
-	for (int ch = 1; ch <= 99; ++ch)
+	for (int ch = CTVSet::MIN_CHANNEL; ch <= CTVSet::MAX_CHANNEL; ++ch)
 	{
 		if (auto nameOpt = m_tv.GetChannelName(ch))
 		{

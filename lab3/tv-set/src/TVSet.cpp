@@ -42,7 +42,11 @@ void CTVSet::TurnOff()
 
 int CTVSet::GetChannel() const
 {
-	return m_isOn ? m_currentChannel : 0;
+	if (m_isOn)
+	{
+		return m_currentChannel;
+	}
+	return 0;
 }
 
 bool CTVSet::SelectChannelByNumber(const int channel)
@@ -66,13 +70,13 @@ bool CTVSet::SelectChannelByName(const std::string& name)
 		return false;
 	}
 
-	const auto channelOpt = GetChannelByName(name);
-	if (!channelOpt)
+	const auto channelNumber = GetChannelByName(name);
+	if (!channelNumber)
 	{
 		return false;
 	}
 
-	return SelectChannelByNumber(*channelOpt);
+	return SelectChannelByNumber(*channelNumber);
 }
 
 bool CTVSet::SelectPreviousChannel()
@@ -160,7 +164,9 @@ std::optional<std::string> CTVSet::GetChannelName(const int channel) const
 
 	const auto channelName = m_channelToName.find(channel);
 	if (channelName != m_channelToName.end())
+	{
 		return channelName->second;
+	}
 	return std::nullopt;
 }
 
@@ -179,7 +185,7 @@ std::optional<int> CTVSet::GetChannelByName(const std::string& name) const
 
 	const auto channel = m_nameToChannel.find(normalizedName);
 	return channel != m_nameToChannel.end() ? std::optional(channel->second)
-									   : std::nullopt;
+											: std::nullopt;
 }
 
 std::string CTVSet::NormalizeName(const std::string& name)
