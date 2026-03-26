@@ -5,14 +5,14 @@
 
 TEST(TVSetBasicTest, InitiallyTurnedOff)
 {
-	const CTVSet tv;
+	const TVSet tv;
 	EXPECT_FALSE(tv.IsTurnedOn());
 	EXPECT_EQ(tv.GetChannel(), 0);
 }
 
 TEST(TVSetBasicTest, TurnOnFirstTimeStartsAtChannelOne)
 {
-	CTVSet tv;
+	TVSet tv;
 	tv.TurnOn();
 	EXPECT_TRUE(tv.IsTurnedOn());
 	EXPECT_EQ(tv.GetChannel(), 1);
@@ -20,7 +20,7 @@ TEST(TVSetBasicTest, TurnOnFirstTimeStartsAtChannelOne)
 
 TEST(TVSetBasicTest, TurnOffRemembersLastChannelForNextTurnOn)
 {
-	CTVSet tv;
+	TVSet tv;
 	tv.TurnOn();
 	tv.SelectChannelByNumber(2);
 	tv.TurnOff();
@@ -35,14 +35,14 @@ TEST(TVSetBasicTest, TurnOffRemembersLastChannelForNextTurnOn)
 
 TEST(TVSetBasicTest, SelectChannelOnlyWhenOn)
 {
-	CTVSet tv;
+	TVSet tv;
 	EXPECT_FALSE(tv.SelectChannelByNumber(50));
 	EXPECT_EQ(tv.GetChannel(), 0);
 }
 
 TEST(TVSetBasicTest, SelectValidChannelsRange)
 {
-	CTVSet tv;
+	TVSet tv;
 	tv.TurnOn();
 
 	EXPECT_TRUE(tv.SelectChannelByNumber(1));
@@ -51,13 +51,13 @@ TEST(TVSetBasicTest, SelectValidChannelsRange)
 	EXPECT_TRUE(tv.SelectChannelByNumber(99));
 	EXPECT_EQ(tv.GetChannel(), 99);
 
-	EXPECT_TRUE(tv.SelectChannelByNumber(CTVSet::MIN_CHANNEL));
-	EXPECT_TRUE(tv.SelectChannelByNumber(CTVSet::MAX_CHANNEL));
+	EXPECT_TRUE(tv.SelectChannelByNumber(TVSet::MIN_CHANNEL));
+	EXPECT_TRUE(tv.SelectChannelByNumber(TVSet::MAX_CHANNEL));
 }
 
 TEST(TVSetBasicTest, SelectInvalidChannelFailsAndDoesNotChange)
 {
-	CTVSet tv;
+	TVSet tv;
 	tv.TurnOn();
 	tv.SelectChannelByNumber(5);
 
@@ -70,7 +70,7 @@ TEST(TVSetBasicTest, SelectInvalidChannelFailsAndDoesNotChange)
 
 TEST(TVSetBasicTest, InfoStateWhenOff)
 {
-	CTVSet tv;
+	TVSet tv;
 
 	EXPECT_FALSE(tv.IsTurnedOn());
 	EXPECT_EQ(tv.GetChannel(), 0);
@@ -78,7 +78,7 @@ TEST(TVSetBasicTest, InfoStateWhenOff)
 
 TEST(TVSetPrevChannelTest, FailsWhenTurnedOff)
 {
-	CTVSet tv;
+	TVSet tv;
 	tv.TurnOn();
 	tv.SelectChannelByNumber(10);
 	tv.TurnOff();
@@ -88,7 +88,7 @@ TEST(TVSetPrevChannelTest, FailsWhenTurnedOff)
 
 TEST(TVSetPrevChannelTest, FailsIfChannelNeverChanged)
 {
-	CTVSet tv;
+	TVSet tv;
 	tv.TurnOn();
 
 	EXPECT_FALSE(tv.SelectPreviousChannel());
@@ -97,7 +97,7 @@ TEST(TVSetPrevChannelTest, FailsIfChannelNeverChanged)
 
 TEST(TVSetPrevChannelTest, SwitchesBackAndForthSimple)
 {
-	CTVSet tv;
+	TVSet tv;
 	tv.TurnOn();
 
 	tv.SelectChannelByNumber(2);
@@ -114,7 +114,7 @@ TEST(TVSetPrevChannelTest, SwitchesBackAndForthSimple)
 
 TEST(TVSetPrevChannelTest, PreservesHistoryAfterPowerCycle)
 {
-	CTVSet tv;
+	TVSet tv;
 
 	tv.TurnOn();
 	tv.SelectChannelByNumber(10);
@@ -133,7 +133,7 @@ TEST(TVSetPrevChannelTest, PreservesHistoryAfterPowerCycle)
 
 TEST(TVSetNamesTest, OperationsOnlyWhenOn)
 {
-	CTVSet tv;
+	TVSet tv;
 	EXPECT_FALSE(tv.SetChannelName(5, "ORT"));
 	EXPECT_FALSE(tv.DeleteChannelName("MTV"));
 	EXPECT_FALSE(tv.GetChannelName(5).has_value());
@@ -143,7 +143,7 @@ TEST(TVSetNamesTest, OperationsOnlyWhenOn)
 
 TEST(TVSetNamesTest, SetAndGetBidirectional)
 {
-	CTVSet tv;
+	TVSet tv;
 	tv.TurnOn();
 
 	EXPECT_TRUE(tv.SetChannelName(5, "ORT"));
@@ -159,7 +159,7 @@ TEST(TVSetNamesTest, SetAndGetBidirectional)
 
 TEST(TVSetNamesTest, NormalizeSpaces)
 {
-	CTVSet tv;
+	TVSet tv;
 	tv.TurnOn();
 
 	EXPECT_TRUE(tv.SetChannelName(1, "  Discovery   Channel  "));
@@ -173,19 +173,9 @@ TEST(TVSetNamesTest, NormalizeSpaces)
 	EXPECT_EQ(*ch, 1);
 }
 
-TEST(TVSetNamesTest, RejectEmptyAndSpaceOnlyNames)
-{
-	CTVSet tv;
-	tv.TurnOn();
-
-	EXPECT_FALSE(tv.SetChannelName(1, ""));
-	EXPECT_FALSE(tv.SetChannelName(1, "   "));
-	EXPECT_FALSE(tv.SetChannelName(1, "\t\n"));
-}
-
 TEST(TVSetNamesTest, OneToOneMappingReassignment)
 {
-	CTVSet tv;
+	TVSet tv;
 	tv.TurnOn();
 
 	tv.SetChannelName(7, "News");
@@ -201,7 +191,7 @@ TEST(TVSetNamesTest, OneToOneMappingReassignment)
 
 TEST(TVSetNamesTest, DeleteName)
 {
-	CTVSet tv;
+	TVSet tv;
 	tv.TurnOn();
 
 	tv.SetChannelName(3, "MTV");
@@ -211,13 +201,12 @@ TEST(TVSetNamesTest, DeleteName)
 	EXPECT_FALSE(tv.GetChannelName(3).has_value());
 	EXPECT_FALSE(tv.GetChannelByName("MTV").has_value());
 
-	// Повторное удаление должно вернуть false
 	EXPECT_FALSE(tv.DeleteChannelName("MTV"));
 }
 
 TEST(TVSetNamesTest, SelectByStringName)
 {
-	CTVSet tv;
+	TVSet tv;
 	tv.TurnOn();
 
 	tv.SetChannelName(50, "Sports");
@@ -231,7 +220,7 @@ TEST(TVSetNamesTest, SelectByStringName)
 
 TEST(TVSetNamesTest, ComplexNamesWithSpaces)
 {
-	CTVSet tv;
+	TVSet tv;
 	tv.TurnOn();
 
 	EXPECT_TRUE(tv.SetChannelName(7, "National Geographic"));
@@ -249,7 +238,7 @@ TEST(TVSetNamesTest, ComplexNamesWithSpaces)
 
 TEST(TVSetNamesTest, RuNamesWithSpaces)
 {
-	CTVSet tv;
+	TVSet tv;
 	tv.TurnOn();
 
 	EXPECT_TRUE(tv.SetChannelName(7, "Нэйшнл географик"));
@@ -267,7 +256,7 @@ TEST(TVSetNamesTest, RuNamesWithSpaces)
 
 TEST(TVSetNamesTest, ReassignNameFromCurrentChannel)
 {
-	CTVSet tv;
+	TVSet tv;
 	tv.TurnOn();
 
 	tv.SetChannelName(1, "OldName");

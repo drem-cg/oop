@@ -7,12 +7,12 @@
 #include <utility>
 #include <vector>
 
-class CTVSet;
+class TVSet;
 
-class CRemoteControl
+class RemoteControl
 {
 public:
-	CRemoteControl(CTVSet& tv, std::istream& input, std::ostream& output);
+	RemoteControl(TVSet& tv, std::istream& input, std::ostream& output);
 	[[nodiscard]] bool HandleCommand() const;
 
 private:
@@ -32,7 +32,7 @@ private:
 	using Handler = std::function<bool(std::istream&)>;
 	using ActionMap = std::map<std::string, Handler>;
 
-	CTVSet& m_tv;
+	TVSet& m_tv;
 	std::istream& m_input;
 	std::ostream& m_output;
 	const ActionMap m_actionMap;

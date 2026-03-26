@@ -2,24 +2,24 @@
 #include <algorithm>
 #include <cctype>
 
-CTVSet::CTVSet()
+TVSet::TVSet()
 	: m_isOn(false)
 	, m_currentChannel(0)
 	, m_lastChannel(0)
 {
 }
 
-bool CTVSet::IsValidChannel(const int channel)
+bool TVSet::IsValidChannel(const int channel)
 {
 	return channel >= MIN_CHANNEL && channel <= MAX_CHANNEL;
 }
 
-bool CTVSet::IsTurnedOn() const
+bool TVSet::IsTurnedOn() const
 {
 	return m_isOn;
 }
 
-void CTVSet::TurnOn()
+void TVSet::TurnOn()
 {
 	if (!m_isOn)
 	{
@@ -32,7 +32,7 @@ void CTVSet::TurnOn()
 	}
 }
 
-void CTVSet::TurnOff()
+void TVSet::TurnOff()
 {
 	if (m_isOn)
 	{
@@ -40,7 +40,7 @@ void CTVSet::TurnOff()
 	}
 }
 
-int CTVSet::GetChannel() const
+int TVSet::GetChannel() const
 {
 	if (m_isOn)
 	{
@@ -49,7 +49,7 @@ int CTVSet::GetChannel() const
 	return 0;
 }
 
-bool CTVSet::SelectChannelByNumber(const int channel)
+bool TVSet::SelectChannelByNumber(const int channel)
 {
 	if (!m_isOn || !IsValidChannel(channel))
 		return false;
@@ -63,7 +63,7 @@ bool CTVSet::SelectChannelByNumber(const int channel)
 	return true;
 }
 
-bool CTVSet::SelectChannelByName(const std::string& name)
+bool TVSet::SelectChannelByName(const std::string& name)
 {
 	if (!m_isOn)
 	{
@@ -79,7 +79,7 @@ bool CTVSet::SelectChannelByName(const std::string& name)
 	return SelectChannelByNumber(*channelNumber);
 }
 
-bool CTVSet::SelectPreviousChannel()
+bool TVSet::SelectPreviousChannel()
 {
 	if (!m_isOn)
 	{
@@ -98,7 +98,7 @@ bool CTVSet::SelectPreviousChannel()
 	return true;
 }
 
-bool CTVSet::SetChannelName(const int channel, const std::string& name)
+bool TVSet::SetChannelName(const int channel, const std::string& name)
 {
 	if (!CheckPoweredOn() || !IsValidChannel(channel))
 	{
@@ -131,7 +131,7 @@ bool CTVSet::SetChannelName(const int channel, const std::string& name)
 	return true;
 }
 
-bool CTVSet::DeleteChannelName(const std::string& name)
+bool TVSet::DeleteChannelName(const std::string& name)
 {
 	if (!CheckPoweredOn())
 	{
@@ -157,7 +157,7 @@ bool CTVSet::DeleteChannelName(const std::string& name)
 	return true;
 }
 
-std::optional<std::string> CTVSet::GetChannelName(const int channel) const
+std::optional<std::string> TVSet::GetChannelName(const int channel) const
 {
 	if (!CheckPoweredOn())
 		return std::nullopt;
@@ -170,7 +170,7 @@ std::optional<std::string> CTVSet::GetChannelName(const int channel) const
 	return std::nullopt;
 }
 
-std::optional<int> CTVSet::GetChannelByName(const std::string& name) const
+std::optional<int> TVSet::GetChannelByName(const std::string& name) const
 {
 	if (!CheckPoweredOn())
 	{
@@ -188,13 +188,13 @@ std::optional<int> CTVSet::GetChannelByName(const std::string& name) const
 											: std::nullopt;
 }
 
-std::string CTVSet::NormalizeName(const std::string& name)
+std::string TVSet::NormalizeName(const std::string& name)
 {
 	std::string result;
 	bool isPrevSpace = true;
-	for (const char c : name)
+	for (const char ch : name)
 	{
-		if (std::isspace(static_cast<unsigned char>(c)))
+		if (ch == ' ')
 		{
 			if (!isPrevSpace)
 			{
@@ -204,7 +204,7 @@ std::string CTVSet::NormalizeName(const std::string& name)
 		}
 		else
 		{
-			result += c;
+			result += ch;
 			isPrevSpace = false;
 		}
 	}
@@ -222,7 +222,7 @@ std::string CTVSet::NormalizeName(const std::string& name)
 	return result;
 }
 
-bool CTVSet::CheckPoweredOn() const
+bool TVSet::CheckPoweredOn() const
 {
 	return m_isOn;
 }

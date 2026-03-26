@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <sstream>
 
-CRemoteControl::CRemoteControl(CTVSet& tv, std::istream& input,
+RemoteControl::RemoteControl(TVSet& tv, std::istream& input,
 	std::ostream& output)
 	: m_tv(tv)
 	, m_input(input)
@@ -24,11 +24,13 @@ CRemoteControl::CRemoteControl(CTVSet& tv, std::istream& input,
 {
 }
 
-bool CRemoteControl::HandleCommand() const
+bool RemoteControl::HandleCommand() const
 {
 	std::string line;
 	if (!std::getline(m_input, line))
+	{
 		return false;
+	}
 
 	std::istringstream stream(line);
 	std::string command;
@@ -41,21 +43,21 @@ bool CRemoteControl::HandleCommand() const
 	return false;
 }
 
-bool CRemoteControl::TurnOn(std::istream&) const
+bool RemoteControl::TurnOn(std::istream&) const
 {
 	m_tv.TurnOn();
 	m_output << "TV is turned on\n";
 	return true;
 }
 
-bool CRemoteControl::TurnOff(std::istream&) const
+bool RemoteControl::TurnOff(std::istream&) const
 {
 	m_tv.TurnOff();
 	m_output << "TV is turned off\n";
 	return true;
 }
 
-bool CRemoteControl::Info(std::istream&) const
+bool RemoteControl::Info(std::istream&) const
 {
 	if (!m_tv.IsTurnedOn())
 	{
@@ -75,11 +77,11 @@ bool CRemoteControl::Info(std::istream&) const
 	return true;
 }
 
-CRemoteControl::ChannelList CRemoteControl::GetSortedChannelNames() const
+RemoteControl::ChannelList RemoteControl::GetSortedChannelNames() const
 {
 	ChannelList result;
 
-	for (int ch = CTVSet::MIN_CHANNEL; ch <= CTVSet::MAX_CHANNEL; ++ch)
+	for (int ch = TVSet::MIN_CHANNEL; ch <= TVSet::MAX_CHANNEL; ++ch)
 	{
 		if (auto nameOpt = m_tv.GetChannelName(ch))
 		{
@@ -93,12 +95,12 @@ CRemoteControl::ChannelList CRemoteControl::GetSortedChannelNames() const
 	return result;
 }
 
-bool CRemoteControl::SelectChannel(std::istream& args) const
+bool RemoteControl::SelectChannel(std::istream& args) const
 {
 	std::string arg;
 	if (!(args >> arg))
 	{
-		m_output << "ERROR\n";
+		m_output << "Arguments reading error\n";
 		return true;
 	}
 
@@ -110,16 +112,19 @@ bool CRemoteControl::SelectChannel(std::istream& args) const
 		if (pos == arg.length())
 		{
 			if (m_tv.SelectChannelByNumber(channel))
+			{
 				m_output << "Channel switched to: " << channel << "\n";
+			}
 			else
-				m_output << "ERROR\n";
+			{
+				m_output << "Channel switch error\n";
+			}
 			return true;
 		}
 	}
 	catch (...)
 	{
 	}
-
 	std::string fullName = arg;
 	std::string rest;
 	while (args >> rest)
@@ -130,27 +135,26 @@ bool CRemoteControl::SelectChannel(std::istream& args) const
 	if (m_tv.SelectChannelByName(fullName))
 		m_output << "Channel switched to: " << fullName << "\n";
 	else
-		m_output << "ERROR\n";
+		m_output << "Channel switch error\n";
 
 	return true;
 }
-
-bool CRemoteControl::SelectPreviousChannel(std::istream&) const
+bool RemoteControl::SelectPreviousChannel(std::istream&) const
 {
 	if (m_tv.SelectPreviousChannel())
 		m_output << "Switched to previous channel\n";
 	else
-		m_output << "ERROR\n";
+		m_output << "Channel switch error\n";
 
 	return true;
 }
 
-bool CRemoteControl::SetChannelName(std::istream& args) const
+bool RemoteControl::SetChannelName(std::istream& args) const
 {
 	int channel;
 	if (!(args >> channel))
 	{
-		m_output << "ERROR\n";
+		m_output << "Arguments reading error\n";
 		return true;
 	}
 
@@ -166,62 +170,72 @@ bool CRemoteControl::SetChannelName(std::istream& args) const
 	if (m_tv.SetChannelName(channel, name))
 		m_output << "Channel name set: " << channel << " - " << name << "\n";
 	else
-		m_output << "ERROR\n";
+		m_output << "Channel set error\n";
 
 	return true;
 }
 
-bool CRemoteControl::DeleteChannelName(std::istream& args) const
+bool RemoteControl::DeleteChannelName(std::istream& args) const
 {
 	std::string name;
 	std::getline(args >> std::ws, name);
 
 	if (name.empty())
 	{
-		m_output << "ERROR\n";
+		m_output << "Error: channel name is not found\n";
 		return true;
 	}
 
 	if (m_tv.DeleteChannelName(name))
+	{
 		m_output << "Channel name deleted: " << name << "\n";
+	}
 	else
-		m_output << "ERROR\n";
+	{
+		m_output << "Error: channel deleting error\n";
+	}
 
 	return true;
 }
 
-bool CRemoteControl::GetChannelName(std::istream& args) const
+bool RemoteControl::GetChannelName(std::istream& args) const
 {
 	int channel;
 	if (!(args >> channel))
 	{
-		m_output << "ERROR\n";
+		m_output << "Arguments reading error\n";
 		return true;
 	}
 
-	if (const auto nameOpt = m_tv.GetChannelName(channel))
-		m_output << "Channel " << channel << " name: " << *nameOpt << "\n";
+	if (const auto channelName = m_tv.GetChannelName(channel))
+	{
+		m_output << "Channel " << channel << " name: " << *channelName << "\n";
+	}
 	else
-		m_output << "ERROR\n";
+		m_output << "Channel get error\n";
 
 	return true;
 }
 
-bool CRemoteControl::GetChannelByName(std::istream& args) const
+bool RemoteControl::GetChannelByName(std::istream& args) const
 {
 	std::string name;
 	std::getline(args >> std::ws, name);
 
 	if (name.empty())
 	{
-		m_output << "ERROR\n";
+		m_output << "Error: channel name is not found\n";
 		return true;
 	}
 
-	if (const auto chOpt = m_tv.GetChannelByName(name))
-		m_output << "Channel for name " << name << ": " << *chOpt << "\n";
+	if (const auto channelName = m_tv.GetChannelByName(name))
+	{
+		m_output << "Channel for name " << name << ": " << *channelName << "\n";
+	}
 	else
-		m_output << "ERROR\n";
+	{
+		m_output << "Error: channel name is not found\n";
+	}
 
-	return true;
+	return false;
 }

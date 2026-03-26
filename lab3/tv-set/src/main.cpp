@@ -4,7 +4,7 @@
 
 int main()
 {
-	CTVSet tv;
-	const CRemoteControl remote(tv, std::cin, std::cout);
+	TVSet tv;
+	const RemoteControl remote(tv, std::cin, std::cout);
 	return remote.HandleCommand();
 }

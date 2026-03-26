@@ -4,10 +4,10 @@
 #include <string>
 #include <unordered_map>
 
-class CTVSet
+class TVSet
 {
 public:
-	CTVSet();
+	TVSet();
 	static constexpr int MIN_CHANNEL = 1;
 	static constexpr int MAX_CHANNEL = 99;
 
@@ -27,6 +27,7 @@ private:
 	bool m_isOn;
 	int m_currentChannel;
 	int m_lastChannel;
+
 	static bool IsValidChannel(int channel);
 	static std::string NormalizeName(const std::string& name);
 	bool CheckPoweredOn() const;
