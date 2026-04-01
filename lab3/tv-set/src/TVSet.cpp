@@ -52,7 +52,7 @@ int TVSet::GetChannel() const
 bool TVSet::SelectChannelByNumber(const int channel)
 {
 	if (!m_isOn || !IsValidChannel(channel))
-		return false;
+		return true;
 
 	if (channel != m_currentChannel)
 	{
@@ -60,21 +60,17 @@ bool TVSet::SelectChannelByNumber(const int channel)
 		m_currentChannel = channel;
 	}
 
-	return true;
+	return false;
 }
 
 bool TVSet::SelectChannelByName(const std::string& name)
 {
 	if (!m_isOn)
-	{
-		return false;
-	}
+		return true;
 
 	const auto channelNumber = GetChannelByName(name);
 	if (!channelNumber)
-	{
-		return false;
-	}
+		return true;
 
 	return SelectChannelByNumber(*channelNumber);
 }
@@ -82,47 +78,36 @@ bool TVSet::SelectChannelByName(const std::string& name)
 bool TVSet::SelectPreviousChannel()
 {
 	if (!m_isOn)
-	{
-		return false;
-	}
+		return true;
 
-	if (m_currentChannel == m_lastChannel)
-	{
-		return false;
-	}
+	if (m_currentChannel == m_lastChannel || m_lastChannel == 0)
+		return true;
 
-	const int temp = m_currentChannel;
-	m_currentChannel = m_lastChannel;
-	m_lastChannel = temp;
-
-	return true;
+	std::swap(m_currentChannel, m_lastChannel);
+	return false;
 }
 
 bool TVSet::SetChannelName(const int channel, const std::string& name)
 {
 	if (!CheckPoweredOn() || !IsValidChannel(channel))
-	{
 		return true;
-	}
 
 	const std::string normalizedName = NormalizeName(name);
 	if (normalizedName.empty())
-	{
 		return true;
+
+	const auto entryByName = m_nameToChannel.find(normalizedName);
+	if (entryByName != m_nameToChannel.end() && entryByName->second != channel)
+	{
+		m_channelToName.erase(entryByName->second);
+		m_nameToChannel.erase(entryByName);
 	}
 
-	const auto entryName = m_nameToChannel.find(normalizedName);
-	if (entryName != m_nameToChannel.end() && entryName->second != channel)
+	const auto entryByChannel = m_channelToName.find(channel);
+	if (entryByChannel != m_channelToName.end())
 	{
-		m_channelToName.erase(entryName->second);
-		m_nameToChannel.erase(entryName);
-	}
-
-	const auto channelName = m_channelToName.find(channel);
-	if (channelName != m_channelToName.end())
-	{
-		m_nameToChannel.erase(channelName->second);
-		m_channelToName.erase(channelName);
+		m_nameToChannel.erase(entryByChannel->second);
+		m_channelToName.erase(entryByChannel);
 	}
 
 	m_channelToName[channel] = normalizedName;
@@ -134,27 +119,21 @@ bool TVSet::SetChannelName(const int channel, const std::string& name)
 bool TVSet::DeleteChannelName(const std::string& name)
 {
 	if (!CheckPoweredOn())
-	{
-		return false;
-	}
+		return true;
 
 	const std::string normalizedName = NormalizeName(name);
 	if (normalizedName.empty())
-	{
-		return false;
-	}
+		return true;
 
 	const auto channelNum = m_nameToChannel.find(normalizedName);
 	if (channelNum == m_nameToChannel.end())
-	{
-		return false;
-	}
+		return true;
 
 	const int channel = channelNum->second;
 	m_nameToChannel.erase(channelNum);
 	m_channelToName.erase(channel);
 
-	return true;
+	return false;
 }
 
 std::optional<std::string> TVSet::GetChannelName(const int channel) const
@@ -164,28 +143,25 @@ std::optional<std::string> TVSet::GetChannelName(const int channel) const
 
 	const auto channelName = m_channelToName.find(channel);
 	if (channelName != m_channelToName.end())
-	{
 		return channelName->second;
-	}
+
 	return std::nullopt;
 }
 
 std::optional<int> TVSet::GetChannelByName(const std::string& name) const
 {
 	if (!CheckPoweredOn())
-	{
 		return std::nullopt;
-	}
 
 	const std::string normalizedName = NormalizeName(name);
 	if (normalizedName.empty())
-	{
 		return std::nullopt;
-	}
 
 	const auto channel = m_nameToChannel.find(normalizedName);
-	return channel != m_nameToChannel.end() ? std::optional(channel->second)
-											: std::nullopt;
+	if (channel != m_nameToChannel.end())
+		return channel->second;
+
+	return std::nullopt;
 }
 
 std::string TVSet::NormalizeName(const std::string& name)
@@ -210,14 +186,10 @@ std::string TVSet::NormalizeName(const std::string& name)
 	}
 
 	if (!result.empty() && result.back() == ' ')
-	{
 		result.pop_back();
-	}
 
 	if (result.find_first_not_of(' ') == std::string::npos)
-	{
 		return "";
-	}
 
 	return result;
 }

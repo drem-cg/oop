@@ -13,6 +13,7 @@ add_executable(tv_app
         src/TVSet.cpp
         src/RemoteControl.h
         src/RemoteControl.cpp
+        src/Logger.h
 )
 
 add_executable(tv_tests
