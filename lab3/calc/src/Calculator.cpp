@@ -108,47 +108,35 @@ bool Calculator::DeclareFunction(const std::string& name, const Function& func)
 	return true;
 }
 
-std::optional<double> Calculator::ComputeFunctionValue(const std::string& name, std::set<std::string>& visited)
+std::optional<double> Calculator::ComputeFunctionValue(const std::string& name)
 {
-	if (visited.contains(name))
-	{
-		Logger::Error("Cycle: " + name);
-		return std::nan("");
-	}
-	visited.insert(name);
-
 	const auto funcIt = m_functions.find(name);
 	if (funcIt == m_functions.end())
 	{
-		visited.erase(name);
 		return std::nullopt;
 	}
 
 	const Function& func = funcIt->second;
 
-	const auto firstOpt = GetValue(func.GetOperand1());
-	if (!firstOpt.has_value())
+	const auto firstOp = GetValue(func.GetOperand1());
+	if (!firstOp.has_value())
 	{
-		visited.erase(name);
 		return std::nullopt;
 	}
 
 	if (!func.IsBinary())
 	{
-		visited.erase(name);
-		return firstOpt;
+		return firstOp;
 	}
 
-	const auto secondOpt = GetValue(func.GetOperand2());
-	if (!secondOpt.has_value())
+	const auto secondOp = GetValue(func.GetOperand2());
+	if (!secondOp.has_value())
 	{
-		visited.erase(name);
 		return std::nullopt;
 	}
 
-	const auto result = ApplyOperation(func.GetOperation(), firstOpt.value(), secondOpt.value(), name);
+	const auto result = ApplyOperation(func.GetOperation(), firstOp.value(), secondOp.value(), name);
 
-	visited.erase(name);
 	return result;
 }
 
@@ -214,8 +202,7 @@ std::optional<double> Calculator::GetValue(const std::string& name)
 	auto funcIter = m_functions.find(name);
 	if (funcIter != m_functions.end())
 	{
-		std::set<std::string> visited;
-		return ComputeFunctionValue(name, visited);
+		return ComputeFunctionValue(name);
 	}
 
 	return std::nullopt;
@@ -243,8 +230,7 @@ void Calculator::PrintFunctions()
 	for (const auto& [name, func] : m_functions)
 	{
 		std::cout << name << ":";
-		std::set<std::string> visited;
-		auto value = ComputeFunctionValue(name, visited);
+		auto value = ComputeFunctionValue(name);
 		if (value.has_value())
 		{
 			std::cout << std::fixed << std::setprecision(2) << value.value();

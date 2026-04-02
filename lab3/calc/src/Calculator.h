@@ -27,6 +27,6 @@ private:
 	std::optional<double> GetOperandValue(const std::string& operandName);
 	std::optional<double> ComputeUnaryFunction(const Function& func);
 	std::optional<double> ComputeBinaryFunction(const Function& func);
-	std::optional<double> ComputeFunctionValue(const std::string& name, std::set<std::string>& visited);
+	std::optional<double> ComputeFunctionValue(const std::string& name);
 	bool IsNameExists(const std::string& name) const;
 };
