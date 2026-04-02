@@ -8,6 +8,19 @@
 Parser::Parser(Calculator& calculator)
 	: m_calculator(calculator)
 {
+	RegisterCommands();
+}
+
+void Parser::RegisterCommands()
+{
+	m_commands = {
+		{ "var", [this](const std::string& tail) { ParseVarCommand(tail); } },
+		{ "let", [this](const std::string& tail) { ParseLetCommand(tail); } },
+		{ "fn", [this](const std::string& tail) { ParseFnCommand(tail); } },
+		{ "print", [this](const std::string& tail) { ParsePrintCommand(tail); } },
+		{ "printvars", [this](const std::string&) { m_calculator.PrintVariables(); } },
+		{ "printfns", [this](const std::string&) { m_calculator.PrintFunctions(); } },
+	};
 }
 
 std::string Parser::Trim(const std::string& str)
@@ -82,43 +95,19 @@ void Parser::ParseNumber(const std::string& str, double& outValue, bool& outSucc
 	}
 }
 
-void Parser::Parse(const std::string& line)
+void Parser::Parse(const std::string& line) const
 {
 	std::istringstream iss(line);
 	std::string command;
 	iss >> command;
 
-	if (command == "var")
+	std::string tail;
+	std::getline(iss, tail);
+
+	auto it = m_commands.find(command);
+	if (it != m_commands.end())
 	{
-		std::string tail;
-		std::getline(iss, tail);
-		ParseVarCommand(tail);
-	}
-	else if (command == "let")
-	{
-		std::string tail;
-		std::getline(iss, tail);
-		ParseLetCommand(tail);
-	}
-	else if (command == "fn")
-	{
-		std::string tail;
-		std::getline(iss, tail);
-		ParseFnCommand(tail);
-	}
-	else if (command == "print")
-	{
-		std::string tail;
-		std::getline(iss, tail);
-		ParsePrintCommand(tail);
-	}
-	else if (command == "printvars")
-	{
-		m_calculator.PrintVariables();
-	}
-	else if (command == "printfns")
-	{
-		m_calculator.PrintFunctions();
+		it->second(tail);
 	}
 	else
 	{
@@ -152,7 +141,7 @@ void Parser::ParseVarCommand(const std::string& tail) const
 	}
 }
 
-void Parser::ParseLetCommand(const std::string& tail)
+void Parser::ParseLetCommand(const std::string& tail) const
 {
 	const auto assignment = ParseAssignment(tail);
 	if (!assignment.isValid)

@@ -1,0 +1,62 @@
+classDiagram
+    class Logger {
+        <<utility>>
+        -static std:: ostream* m_output
+        +static void Info(const std:: string& message)
+        +static void Error(const std:: string& message)
+    }
+
+    class Variable {
+        -double m_value
+        +Variable()
+        +GetValue() const: double
+        +SetValue(double value): void
+        +IsDefined() const: bool
+    }
+
+    class Function {
+        -std:: string m_operand1
+        -std:: string m_operand2
+        -char m_operation
+        -bool m_isBinary
+        +Function(const std:: string& operand1, const std:: string& operand2, char operation)
+        +Function(const std:: string& operand1)
+        +GetOperand1() const: std:: string
+        +GetOperand2() const: std:: string
+        +GetOperation() const: char
+        +IsBinary() const: bool
+    }
+
+    class Calculator {
+        -std:: map<std:: string, Variable> m_variables
+        -std:: map<std:: string, Function> m_functions
+        +DeclareVariable(const std:: string& name): bool
+        +SetVariable(const std:: string& name, double value): bool
+        +DeclareFunction(const std:: string& name, const Function& func): bool
+        +GetValue(const std:: string& name): std:: optional<double>
+        +PrintVariables(): void
+        +PrintFunctions(): void
+        +IsValidIdentifier(const std:: string& name): bool
+        -ComputeFunctionValue(const std:: string& name, std:: set<std:: string>& visited): std:: optional<double>
+        -IsNameExists(const std:: string& name) const: bool
+    }
+
+    class Parser {
+        -Calculator& m_calculator
+        +Parser(Calculator& calculator)
+        +Parse(const std:: string& line): void
+        -ParseVarCommand(const std:: string& tail): void
+        -ParseLetCommand(const std:: string& tail): void
+        -ParseFnCommand(const std:: string& tail): void
+        -ParsePrintCommand(const std:: string& tail): void
+        -ParseNumber(const std:: string& str, double& outValue, bool& outSuccess): void
+        -Trim(const std:: string& str) const: std:: string
+    }
+
+    Logger ..> Variable
+    Logger ..> Function
+    Logger ..> Calculator
+    Logger ..> Parser
+    Calculator "1" *-- "0..*" Variable
+    Calculator "1" *-- "0..*" Function
+    Parser "1" --> "1" Calculator

@@ -22,7 +22,7 @@ RemoteControl::RemoteControl(TVSet& tv, std::istream& input, std::ostream& outpu
 {
 }
 
-bool RemoteControl::HandleCommand()
+bool RemoteControl::HandleCommand() const
 {
 	std::string line;
 	if (!std::getline(m_input, line))
@@ -45,21 +45,21 @@ bool RemoteControl::HandleCommand()
 	return true;
 }
 
-bool RemoteControl::TurnOn(std::istream&)
+bool RemoteControl::TurnOn(std::istream&) const
 {
 	m_tv.TurnOn();
 	m_output << "TV is turned on\n";
 	return false;
 }
 
-bool RemoteControl::TurnOff(std::istream&)
+bool RemoteControl::TurnOff(std::istream&) const
 {
 	m_tv.TurnOff();
 	m_output << "TV is turned off\n";
 	return false;
 }
 
-bool RemoteControl::Info(std::istream&)
+bool RemoteControl::Info(std::istream&) const
 {
 	if (!m_tv.IsTurnedOn())
 	{
@@ -98,7 +98,7 @@ RemoteControl::ChannelList RemoteControl::GetSortedChannelNames() const
 	return result;
 }
 
-bool RemoteControl::SelectChannel(std::istream& args)
+bool RemoteControl::SelectChannel(std::istream& args) const
 {
 	std::string arg;
 	if (!(args >> arg))
@@ -142,7 +142,7 @@ bool RemoteControl::SelectChannel(std::istream& args)
 	return true;
 }
 
-bool RemoteControl::SelectPreviousChannel(std::istream&)
+bool RemoteControl::SelectPreviousChannel(std::istream&) const
 {
 	if (!m_tv.SelectPreviousChannel())
 	{
@@ -153,7 +153,7 @@ bool RemoteControl::SelectPreviousChannel(std::istream&)
 	return true;
 }
 
-bool RemoteControl::SetChannelName(std::istream& args)
+bool RemoteControl::SetChannelName(std::istream& args) const
 {
 	int channel;
 	if (!(args >> channel))
@@ -180,7 +180,7 @@ bool RemoteControl::SetChannelName(std::istream& args)
 	return true;
 }
 
-bool RemoteControl::DeleteChannelName(std::istream& args)
+bool RemoteControl::DeleteChannelName(std::istream& args) const
 {
 	std::string name;
 	std::getline(args >> std::ws, name);
@@ -200,7 +200,7 @@ bool RemoteControl::DeleteChannelName(std::istream& args)
 	return true;
 }
 
-bool RemoteControl::GetChannelName(std::istream& args)
+bool RemoteControl::GetChannelName(std::istream& args) const
 {
 	int channel;
 	if (!(args >> channel))
@@ -218,7 +218,7 @@ bool RemoteControl::GetChannelName(std::istream& args)
 	return true;
 }
 
-bool RemoteControl::GetChannelByName(std::istream& args)
+bool RemoteControl::GetChannelByName(std::istream& args) const
 {
 	std::string name;
 	std::getline(args >> std::ws, name);

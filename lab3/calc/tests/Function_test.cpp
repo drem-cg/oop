@@ -2,11 +2,7 @@
 #include <gtest/gtest.h>
 #include <string>
 
-class FunctionTest : public ::testing::Test
-{
-};
-
-TEST_F(FunctionTest, UnaryFunction_Basic)
+TEST(FunctionTest, Unary_Basic)
 {
 	const Function func("x");
 	EXPECT_FALSE(func.IsBinary());
@@ -15,7 +11,7 @@ TEST_F(FunctionTest, UnaryFunction_Basic)
 	EXPECT_EQ(func.GetOperation(), '\0');
 }
 
-TEST_F(FunctionTest, BinaryFunction_Basic)
+TEST(FunctionTest, Binary_Basic)
 {
 	const Function func("a", "b", '+');
 	EXPECT_TRUE(func.IsBinary());
@@ -24,7 +20,7 @@ TEST_F(FunctionTest, BinaryFunction_Basic)
 	EXPECT_EQ(func.GetOperation(), '+');
 }
 
-TEST_F(FunctionTest, AllOperations)
+TEST(FunctionTest, AllOperations)
 {
 	EXPECT_EQ(Function("x", "y", '+').GetOperation(), '+');
 	EXPECT_EQ(Function("x", "y", '-').GetOperation(), '-');
@@ -32,21 +28,18 @@ TEST_F(FunctionTest, AllOperations)
 	EXPECT_EQ(Function("x", "y", '/').GetOperation(), '/');
 }
 
-TEST_F(FunctionTest, OperandNames_BoundaryCases)
+TEST(FunctionTest, OperandNames_Boundary)
 {
-	const Function shortName("a", "b", '+');
-	EXPECT_EQ(shortName.GetOperand1(), "a");
+	EXPECT_EQ(Function("a", "b", '+').GetOperand1(), "a");
 
 	const std::string longName(100, 'x');
-	const Function longOperand(longName, "y", '*');
-	EXPECT_EQ(longOperand.GetOperand1(), longName);
+	EXPECT_EQ(Function(longName, "y", '*').GetOperand1(), longName);
 
-	const Function withUnderscore("_var1", "var_2", '-');
-	EXPECT_EQ(withUnderscore.GetOperand1(), "_var1");
-	EXPECT_EQ(withUnderscore.GetOperand2(), "var_2");
+	EXPECT_EQ(Function("_var1", "var_2", '-').GetOperand1(), "_var1");
+	EXPECT_EQ(Function("_var1", "var_2", '-').GetOperand2(), "var_2");
 }
 
-TEST_F(FunctionTest, ImmutableAfterCreation)
+TEST(FunctionTest, Immutable)
 {
 	const Function func("x", "y", '/');
 	const Function& constFunc = func;

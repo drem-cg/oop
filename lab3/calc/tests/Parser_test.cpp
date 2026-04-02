@@ -5,185 +5,179 @@
 #include <iostream>
 #include <memory>
 #include <sstream>
-#include <vector>
 
-class ParserTest : public ::testing::Test
+TEST(ParserTest, Var_Basic)
 {
-protected:
 	Calculator calc;
-	std::unique_ptr<Parser> parser;
-	std::streambuf* originalCout;
-	std::ostringstream testOutput;
+	const auto parser = std::make_unique<Parser>(calc);
 
-	void SetUp() override
-	{
-		parser = std::make_unique<Parser>(calc);
-		originalCout = std::cout.rdbuf(testOutput.rdbuf());
-	}
-
-	void TearDown() override
-	{
-		std::cout.rdbuf(originalCout);
-		testOutput.str("");
-		testOutput.clear();
-	}
-
-	std::string GetOutput() const { return testOutput.str(); }
-
-	void ExecuteCommand(const std::string& command) { parser->Parse(command); }
-
-	void ExecuteCommands(const std::vector<std::string>& commands)
-	{
-		for (const auto& cmd : commands)
-			parser->Parse(cmd);
-	}
-
-	void ClearOutput()
-	{
-		testOutput.str("");
-		testOutput.clear();
-	}
-};
-
-TEST_F(ParserTest, Var_ValidAndInvalid)
-{
-	ExecuteCommand("var x");
+	parser->Parse("var x");
 	EXPECT_TRUE(calc.GetValue("x").has_value());
 
-	ClearOutput();
-	ExecuteCommand("var ");
-	EXPECT_EQ(GetOutput(), "Invalid usage\n");
+	std::ostringstream out;
+	std::streambuf* original = std::cout.rdbuf(out.rdbuf());
 
-	ClearOutput();
-	ExecuteCommand("var 123invalid");
-	EXPECT_EQ(GetOutput(), "Invalid usage\n");
+	parser->Parse("var ");
+	EXPECT_EQ(out.str(), "Invalid usage\n");
 
-	ClearOutput();
-	ExecuteCommand("var x");
-	EXPECT_EQ(GetOutput(), "Name already exists\n");
+	out.str("");
+	parser->Parse("var 123invalid");
+	EXPECT_EQ(out.str(), "Invalid usage\n");
+
+	out.str("");
+	parser->Parse("var x");
+	EXPECT_EQ(out.str(), "Name already exists\n");
+
+	std::cout.rdbuf(original);
 }
 
-TEST_F(ParserTest, Let_NumberAndVariable)
+TEST(ParserTest, Let_Basic)
 {
-	ExecuteCommand("let x = 42.5");
-	ASSERT_TRUE(calc.GetValue("x").has_value());
+	Calculator calc;
+	auto parser = std::make_unique<Parser>(calc);
+
+	parser->Parse("let x = 42.5");
 	EXPECT_DOUBLE_EQ(calc.GetValue("x").value(), 42.5);
 
-	ExecuteCommand("let y = x");
-	ASSERT_TRUE(calc.GetValue("y").has_value());
+	parser->Parse("let y = x");
 	EXPECT_DOUBLE_EQ(calc.GetValue("y").value(), 42.5);
 
-	ClearOutput();
-	ExecuteCommand("let z = nonexistent");
-	EXPECT_EQ(GetOutput(), "Name does not exist\n");
+	std::ostringstream out;
+	std::streambuf* original = std::cout.rdbuf(out.rdbuf());
 
-	ClearOutput();
-	ExecuteCommand("let x 10");
-	EXPECT_EQ(GetOutput(), "Invalid usage\n");
+	parser->Parse("let z = nonexistent");
+	EXPECT_EQ(out.str(), "Name does not exist\n");
+
+	out.str("");
+	parser->Parse("let x 10");
+	EXPECT_EQ(out.str(), "Invalid usage\n");
+
+	out.str("");
+	parser->Parse("let = 10");
+	EXPECT_EQ(out.str(), "Invalid usage\n");
+
+	out.str("");
+	parser->Parse("let x =");
+	EXPECT_EQ(out.str(), "Invalid usage\n");
+
+	std::cout.rdbuf(original);
 }
 
-TEST_F(ParserTest, Let_EmptyOperands)
+TEST(ParserTest, Fn_Basic)
 {
-	ClearOutput();
-	ExecuteCommand("let = 10");
-	EXPECT_EQ(GetOutput(), "Invalid usage\n");
+	Calculator calc;
+	const auto parser = std::make_unique<Parser>(calc);
 
-	ClearOutput();
-	ExecuteCommand("let x =");
-	EXPECT_EQ(GetOutput(), "Invalid usage\n");
-}
-
-TEST_F(ParserTest, Fn_UnaryAndBinary)
-{
-	ExecuteCommands({ "var x", "var y", "fn f = x", "fn sum = x + y" });
-	ExecuteCommands({ "let x = 5", "let y = 3" });
+	parser->Parse("var x");
+	parser->Parse("var y");
+	parser->Parse("fn f = x");
+	parser->Parse("fn sum = x + y");
+	parser->Parse("let x = 5");
+	parser->Parse("let y = 3");
 
 	EXPECT_DOUBLE_EQ(calc.GetValue("f").value(), 5.0);
 	EXPECT_DOUBLE_EQ(calc.GetValue("sum").value(), 8.0);
 
-	ClearOutput();
-	ExecuteCommand("fn f x");
-	EXPECT_EQ(GetOutput(), "Invalid usage\n");
+	std::ostringstream out;
+	std::streambuf* original = std::cout.rdbuf(out.rdbuf());
+
+	parser->Parse("fn f x");
+	EXPECT_EQ(out.str(), "Invalid usage\n");
+
+	out.str("");
+	parser->Parse("var z");
+	parser->Parse("fn f = z");
+	EXPECT_EQ(out.str(), "Name already exists\n");
+
+	std::cout.rdbuf(original);
 }
 
-TEST_F(ParserTest, Fn_DuplicateName)
+TEST(ParserTest, Print_Basic)
 {
-	ExecuteCommands({ "var x", "fn f = x" });
-	ClearOutput();
-	ExecuteCommand("fn f = x");
-	EXPECT_EQ(GetOutput(), "Name already exists\n");
+	Calculator calc;
+	const auto parser = std::make_unique<Parser>(calc);
+	std::ostringstream out;
+	std::streambuf* original = std::cout.rdbuf(out.rdbuf());
+
+	parser->Parse("let x = 42");
+	parser->Parse("print x");
+	EXPECT_EQ(out.str(), "42.00\n");
+
+	out.str("");
+	parser->Parse("var y");
+	parser->Parse("print y");
+	EXPECT_EQ(out.str(), "nan\n");
+
+	out.str("");
+	parser->Parse("print nonexistent");
+	EXPECT_EQ(out.str(), "nan\n");
+
+	out.str("");
+	parser->Parse("print ");
+	EXPECT_EQ(out.str(), "Invalid usage\n");
+
+	std::cout.rdbuf(original);
 }
 
-TEST_F(ParserTest, Print_ValueAndErrors)
+TEST(ParserTest, PrintVars_Printfns)
 {
-	ExecuteCommand("let x = 42");
-	ExecuteCommand("print x");
-	EXPECT_EQ(GetOutput(), "42.00\n");
+	Calculator calc;
+	auto parser = std::make_unique<Parser>(calc);
+	std::ostringstream out;
+	std::streambuf* original = std::cout.rdbuf(out.rdbuf());
 
-	ClearOutput();
-	ExecuteCommand("var y");
-	ExecuteCommand("print y");
-	EXPECT_EQ(GetOutput(), "nan\n");
-
-	ClearOutput();
-	ExecuteCommand("print nonexistent");
-	EXPECT_EQ(GetOutput(), "nan\n");
-
-	ClearOutput();
-	ExecuteCommand("print ");
-	EXPECT_EQ(GetOutput(), "Invalid usage\n");
-}
-
-TEST_F(ParserTest, PrintVars_Printfns)
-{
-	ExecuteCommands({ "let x = 10", "let y = 20" });
-	ClearOutput();
-	ExecuteCommand("printvars");
-	std::string output = GetOutput();
+	parser->Parse("let x = 10");
+	parser->Parse("let y = 20");
+	parser->Parse("printvars");
+	std::string output = out.str();
 	EXPECT_NE(output.find("x:10.00"), std::string::npos);
 	EXPECT_NE(output.find("y:20.00"), std::string::npos);
 
-	ClearOutput();
-	ExecuteCommand("var z");
-	ExecuteCommand("printvars");
-	output = GetOutput();
-	EXPECT_NE(output.find("z:nan"), std::string::npos);
+	out.str("");
+	parser->Parse("var z");
+	parser->Parse("printvars");
+	EXPECT_NE(out.str().find("z:nan"), std::string::npos);
 
-	ExecuteCommands({ "var a", "var b", "fn f = a + b", "let a = 5", "let b = 3" });
-	ClearOutput();
-	ExecuteCommand("printfns");
-	output = GetOutput();
-	EXPECT_NE(output.find("f:8.00"), std::string::npos);
+	out.str("");
+	parser->Parse("var a");
+	parser->Parse("var b");
+	parser->Parse("fn f = a + b");
+	parser->Parse("let a = 5");
+	parser->Parse("let b = 3");
+	parser->Parse("printfns");
+	EXPECT_NE(out.str().find("f:8.00"), std::string::npos);
+
+	std::cout.rdbuf(original);
 }
 
-TEST_F(ParserTest, UnknownCommand)
+TEST(ParserTest, UnknownAndEdgeCases)
 {
-	ClearOutput();
-	ExecuteCommand("unknowncommand");
-	EXPECT_EQ(GetOutput(), "Unknown command\n");
-}
+	Calculator calc;
+	auto parser = std::make_unique<Parser>(calc);
+	std::ostringstream out;
+	std::streambuf* original = std::cout.rdbuf(out.rdbuf());
 
-TEST_F(ParserTest, EdgeCase_SpacesAndTabs)
-{
-	ExecuteCommand("let    x    =    42");
-	ASSERT_TRUE(calc.GetValue("x").has_value());
+	parser->Parse("unknowncommand");
+	EXPECT_EQ(out.str(), "Unknown command\n");
+
+	out.str("");
+	parser->Parse("let    x    =    42");
 	EXPECT_DOUBLE_EQ(calc.GetValue("x").value(), 42.0);
 
-	ExecuteCommand("var \t y \t ");
+	parser->Parse("var \t y \t ");
 	EXPECT_TRUE(calc.GetValue("y").has_value());
-}
 
-TEST_F(ParserTest, EdgeCase_InvalidIdentifiers)
-{
-	ClearOutput();
-	ExecuteCommand("var 123start");
-	EXPECT_EQ(GetOutput(), "Invalid usage\n");
+	out.str("");
+	parser->Parse("var 123start");
+	EXPECT_EQ(out.str(), "Invalid usage\n");
 
-	ClearOutput();
-	ExecuteCommand("var my-var");
-	EXPECT_EQ(GetOutput(), "Invalid usage\n");
+	out.str("");
+	parser->Parse("var my-var");
+	EXPECT_EQ(out.str(), "Invalid usage\n");
 
-	ClearOutput();
-	ExecuteCommand("var my.var");
-	EXPECT_EQ(GetOutput(), "Invalid usage\n");
+	out.str("");
+	parser->Parse("var my.var");
+	EXPECT_EQ(out.str(), "Invalid usage\n");
+
+	std::cout.rdbuf(original);
 }

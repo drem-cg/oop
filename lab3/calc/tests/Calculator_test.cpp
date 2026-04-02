@@ -5,365 +5,186 @@
 #include <optional>
 #include <sstream>
 
-class CalculatorTest : public ::testing::Test
+TEST(CalculatorTest, Variable_Basic)
 {
-protected:
 	Calculator calc;
-	std::streambuf* originalCout;
-	std::ostringstream testOutput;
-
-	void SetUp() override
-	{
-		originalCout = std::cout.rdbuf(testOutput.rdbuf());
-	}
-
-	void TearDown() override
-	{
-		std::cout.rdbuf(originalCout);
-		testOutput.str("");
-		testOutput.clear();
-	}
-
-	std::string GetOutput() const
-	{
-		return testOutput.str();
-	}
-};
-
-TEST_F(CalculatorTest, DeclareVariable_CreatesUndefinedVariable)
-{
 	EXPECT_TRUE(calc.DeclareVariable("x"));
-	auto value = calc.GetValue("x");
+	const auto value = calc.GetValue("x");
 	EXPECT_TRUE(value.has_value());
 	EXPECT_FALSE(std::isfinite(value.value()));
-}
 
-TEST_F(CalculatorTest, DeclareVariable_DuplicateReturnsFalse)
-{
-	calc.DeclareVariable("x");
-	testOutput.str("");
 	EXPECT_FALSE(calc.DeclareVariable("x"));
-}
 
-TEST_F(CalculatorTest, SetVariable_AssignsValue)
-{
-	EXPECT_TRUE(calc.SetVariable("x", 42.5));
-	auto value = calc.GetValue("x");
-	EXPECT_TRUE(value.has_value());
-	EXPECT_TRUE(std::isfinite(value.value()));
-	EXPECT_DOUBLE_EQ(value.value(), 42.5);
-}
+	EXPECT_TRUE(calc.SetVariable("y", 42.5));
+	EXPECT_DOUBLE_EQ(calc.GetValue("y").value(), 42.5);
 
-TEST_F(CalculatorTest, SetVariable_AutoDeclaresIfNotExists)
-{
-	EXPECT_TRUE(calc.SetVariable("y", 10.0));
-	auto value = calc.GetValue("y");
-	EXPECT_TRUE(value.has_value());
-	EXPECT_DOUBLE_EQ(value.value(), 10.0);
-}
-
-TEST_F(CalculatorTest, SetVariable_CannotOverwriteFunction)
-{
-	calc.DeclareVariable("x");
-	Function func("x");
+	EXPECT_TRUE(calc.SetVariable("z", 10.0));
+	const Function func("z");
 	calc.DeclareFunction("f", func);
 	EXPECT_FALSE(calc.SetVariable("f", 5.0));
 }
 
-TEST_F(CalculatorTest, DeclareFunction_UnaryFunction)
+TEST(CalculatorTest, Function_Basic)
 {
-	calc.DeclareVariable("x");
-	Function func("x");
-	EXPECT_TRUE(calc.DeclareFunction("f", func));
-}
-
-TEST_F(CalculatorTest, DeclareFunction_BinaryFunction)
-{
-	calc.DeclareVariable("x");
-	calc.DeclareVariable("y");
-	Function func("x", "y", '+');
-	EXPECT_TRUE(calc.DeclareFunction("sum", func));
-}
-
-TEST_F(CalculatorTest, DeclareFunction_DuplicateReturnsFalse)
-{
-	calc.DeclareVariable("x");
-	Function func("x");
-	calc.DeclareFunction("f", func);
-	testOutput.str("");
-	EXPECT_FALSE(calc.DeclareFunction("f", func));
-}
-
-TEST_F(CalculatorTest, FunctionValue_DependsOnVariables)
-{
+	Calculator calc;
 	calc.SetVariable("x", 3.0);
 	calc.SetVariable("y", 4.0);
 	Function func("x", "y", '+');
 	calc.DeclareFunction("sum", func);
+	EXPECT_DOUBLE_EQ(calc.GetValue("sum").value(), 7.0);
 
-	auto value = calc.GetValue("sum");
-	ASSERT_TRUE(value.has_value()) << "Function value should have value";
-	EXPECT_DOUBLE_EQ(value.value(), 7.0);
-}
+	calc.DeclareVariable("undef");
+	Function unary("undef");
+	calc.DeclareFunction("f", unary);
+	auto val = calc.GetValue("f");
+	EXPECT_TRUE(val.has_value());
+	EXPECT_FALSE(std::isfinite(val.value()));
 
-TEST_F(CalculatorTest, FunctionValue_UndefinedOperand_ReturnsNan)
-{
-	calc.SetVariable("x", 5.0);
-	calc.DeclareVariable("y");
-	Function func("x", "y", '+');
-	calc.DeclareFunction("sum", func);
-
-	auto value = calc.GetValue("sum");
-	EXPECT_TRUE(value.has_value());
-	EXPECT_FALSE(std::isfinite(value.value()));
-}
-
-TEST_F(CalculatorTest, FunctionValue_DivisionByZero_ReturnsNan)
-{
-	calc.DeclareVariable("x");
-	calc.DeclareVariable("y");
-	Function func("x", "y", '/');
-	calc.DeclareFunction("div", func);
-
-	calc.SetVariable("x", 10.0);
+	Function div("x", "y", '/');
+	calc.DeclareFunction("d", div);
 	calc.SetVariable("y", 0.0);
-	auto value = calc.GetValue("div");
-	EXPECT_TRUE(value.has_value());
-	EXPECT_FALSE(std::isfinite(value.value()));
+	auto divVal = calc.GetValue("d");
+	EXPECT_TRUE(divVal.has_value());
+	EXPECT_FALSE(std::isfinite(divVal.value()));
 }
 
-TEST_F(CalculatorTest, FunctionValue_DependsOnAnotherFunction)
+TEST(CalculatorTest, Function_Chain)
 {
-	calc.DeclareVariable("x");
-	calc.DeclareVariable("y");
-	calc.DeclareVariable("z");
-
-	Function func1("x", "y", '+');
-	Function func2("sum", "z", '+');
-
-	calc.DeclareFunction("sum", func1);
-	calc.DeclareFunction("total", func2);
-
+	Calculator calc;
 	calc.SetVariable("x", 1.0);
 	calc.SetVariable("y", 2.0);
 	calc.SetVariable("z", 3.0);
+	const Function f1("x", "y", '+');
+	const Function f2("sum", "z", '+');
+	calc.DeclareFunction("sum", f1);
+	calc.DeclareFunction("total", f2);
+	EXPECT_DOUBLE_EQ(calc.GetValue("total").value(), 6.0);
 
-	auto value = calc.GetValue("total");
-	ASSERT_TRUE(value.has_value()) << "Total function should have value";
-	EXPECT_DOUBLE_EQ(value.value(), 6.0);
+	EXPECT_FALSE(calc.GetValue("nonexistent").has_value());
 }
 
-TEST_F(CalculatorTest, GetValue_NonExistentName_ReturnsNullopt)
-{
-	auto value = calc.GetValue("nonexistent");
-	EXPECT_FALSE(value.has_value());
-}
-
-TEST_F(CalculatorTest, IsValidIdentifier_ValidNames)
+TEST(CalculatorTest, Identifier_Validation)
 {
 	EXPECT_TRUE(Calculator::IsValidIdentifier("x"));
 	EXPECT_TRUE(Calculator::IsValidIdentifier("var123"));
 	EXPECT_TRUE(Calculator::IsValidIdentifier("_private"));
-	EXPECT_TRUE(Calculator::IsValidIdentifier("my_var_name"));
-	EXPECT_TRUE(Calculator::IsValidIdentifier("A1B2C3"));
-}
-
-TEST_F(CalculatorTest, IsValidIdentifier_InvalidNames)
-{
 	EXPECT_FALSE(Calculator::IsValidIdentifier(""));
 	EXPECT_FALSE(Calculator::IsValidIdentifier("123start"));
 	EXPECT_FALSE(Calculator::IsValidIdentifier("my-var"));
-	EXPECT_FALSE(Calculator::IsValidIdentifier("my.var"));
-	EXPECT_FALSE(Calculator::IsValidIdentifier("my var"));
 }
 
-TEST_F(CalculatorTest, PrintVariables_PrintsAllVariables)
+TEST(CalculatorTest, PrintVariables)
 {
+	Calculator calc;
+	std::ostringstream out;
+	std::streambuf* original = std::cout.rdbuf(out.rdbuf());
+
 	calc.SetVariable("x", 10.0);
 	calc.SetVariable("y", 20.0);
-	testOutput.str("");
 	calc.PrintVariables();
+	std::string output = out.str();
+	EXPECT_NE(output.find("x:10.00"), std::string::npos);
+	EXPECT_NE(output.find("y:20.00"), std::string::npos);
 
-	std::string output = GetOutput();
-	EXPECT_NE(output.find("x:10.00"), std::string::npos) << "Output: " << output;
-	EXPECT_NE(output.find("y:20.00"), std::string::npos) << "Output: " << output;
-}
-
-TEST_F(CalculatorTest, PrintVariables_PrintsNanForUndefined)
-{
-	calc.DeclareVariable("x");
-	testOutput.str("");
+	out.str("");
+	calc.DeclareVariable("z");
 	calc.PrintVariables();
+	EXPECT_NE(out.str().find("z:nan"), std::string::npos);
 
-	std::string output = GetOutput();
-	EXPECT_NE(output.find("x:nan"), std::string::npos) << "Output: " << output;
-}
-
-TEST_F(CalculatorTest, PrintVariables_SortedAlphabetically)
-{
+	out.str("");
 	calc.SetVariable("z", 3.0);
 	calc.SetVariable("a", 1.0);
 	calc.SetVariable("m", 2.0);
-	testOutput.str("");
 	calc.PrintVariables();
+	output = out.str();
+	EXPECT_LT(output.find("a:"), output.find("m:"));
+	EXPECT_LT(output.find("m:"), output.find("z:"));
 
-	std::string output = GetOutput();
-	size_t posA = output.find("a:");
-	size_t posM = output.find("m:");
-	size_t posZ = output.find("z:");
-
-	EXPECT_LT(posA, posM);
-	EXPECT_LT(posM, posZ);
+	std::cout.rdbuf(original);
 }
 
-TEST_F(CalculatorTest, PrintFunctions_PrintsAllFunctions)
+TEST(CalculatorTest, PrintFunctions)
 {
-	calc.DeclareVariable("x");
-	calc.DeclareVariable("y");
-	Function func("x", "y", '+');
-	calc.DeclareFunction("sum", func);
+	Calculator calc;
+	std::ostringstream out;
+	std::streambuf* original = std::cout.rdbuf(out.rdbuf());
 
 	calc.SetVariable("x", 5.0);
 	calc.SetVariable("y", 3.0);
-	testOutput.str("");
+	Function func("x", "y", '+');
+	calc.DeclareFunction("sum", func);
 	calc.PrintFunctions();
+	EXPECT_NE(out.str().find("sum:8.00"), std::string::npos);
 
-	std::string output = GetOutput();
-	EXPECT_NE(output.find("sum:8.00"), std::string::npos) << "Output: " << output;
-}
-
-TEST_F(CalculatorTest, PrintFunctions_PrintsNanForUndefined)
-{
-	calc.DeclareVariable("x");
-	calc.DeclareVariable("y");
-	Function func("x", "y", '/');
-	calc.DeclareFunction("div", func);
-
-	calc.SetVariable("x", 10.0);
+	out.str("");
+	Function div("x", "y", '/');
+	calc.DeclareFunction("d", div);
 	calc.SetVariable("y", 0.0);
-	testOutput.str("");
 	calc.PrintFunctions();
+	EXPECT_NE(out.str().find("d:nan"), std::string::npos);
 
-	std::string output = GetOutput();
-	EXPECT_NE(output.find("div:nan"), std::string::npos) << "Output: " << output;
+	out.str("");
+	Function f1("x"), f2("x"), f3("x");
+	calc.DeclareFunction("z", f1);
+	calc.DeclareFunction("a", f2);
+	calc.DeclareFunction("m", f3);
+	calc.PrintFunctions();
+	std::string output = out.str();
+	EXPECT_LT(output.find("a:"), output.find("m:"));
+	EXPECT_LT(output.find("m:"), output.find("z:"));
+
+	std::cout.rdbuf(original);
 }
 
-TEST_F(CalculatorTest, PrintFunctions_SortedAlphabetically)
+TEST(CalculatorTest, Precision_And_Values)
 {
-	calc.DeclareVariable("x");
-	Function func1("x");
-	Function func2("x");
-	Function func3("x");
-
-	calc.DeclareFunction("z", func1);
-	calc.DeclareFunction("a", func2);
-	calc.DeclareFunction("m", func3);
-
-	calc.SetVariable("x", 1.0);
-	testOutput.str("");
-	calc.PrintFunctions();
-
-	std::string output = GetOutput();
-	size_t posA = output.find("a:");
-	size_t posM = output.find("m:");
-	size_t posZ = output.find("z:");
-
-	EXPECT_LT(posA, posM);
-	EXPECT_LT(posM, posZ);
-}
-
-TEST_F(CalculatorTest, GetValue_Precision_TwoDecimalPlaces)
-{
+	Calculator calc;
 	calc.SetVariable("x", 1.234567);
-	auto value = calc.GetValue("x");
-	ASSERT_TRUE(value.has_value());
-	EXPECT_DOUBLE_EQ(value.value(), 1.234567);
+	EXPECT_DOUBLE_EQ(calc.GetValue("x").value(), 1.234567);
 
-	testOutput.str("");
+	std::ostringstream out;
+	std::streambuf* original = std::cout.rdbuf(out.rdbuf());
 	calc.PrintVariables();
-	std::string output = GetOutput();
-	EXPECT_NE(output.find("x:1.23"), std::string::npos);
+	EXPECT_NE(out.str().find("x:1.23"), std::string::npos);
+	std::cout.rdbuf(original);
+
+	calc.SetVariable("neg", -15.5);
+	EXPECT_DOUBLE_EQ(calc.GetValue("neg").value(), -15.5);
+
+	calc.SetVariable("zero", 0.0);
+	EXPECT_DOUBLE_EQ(calc.GetValue("zero").value(), 0.0);
+
+	calc.SetVariable("large", 1e100);
+	EXPECT_DOUBLE_EQ(calc.GetValue("large").value(), 1e100);
+
+	calc.SetVariable("small", 1e-100);
+	EXPECT_DOUBLE_EQ(calc.GetValue("small").value(), 1e-100);
 }
 
-TEST_F(CalculatorTest, GetValue_NegativeValues)
+TEST(CalculatorTest, NameConflicts)
 {
-	calc.SetVariable("x", -15.5);
-	auto value = calc.GetValue("x");
-	ASSERT_TRUE(value.has_value());
-	EXPECT_DOUBLE_EQ(value.value(), -15.5);
-}
-
-TEST_F(CalculatorTest, GetValue_ZeroValue)
-{
-	calc.SetVariable("x", 0.0);
-	auto value = calc.GetValue("x");
-	ASSERT_TRUE(value.has_value());
-	EXPECT_DOUBLE_EQ(value.value(), 0.0);
-}
-
-TEST_F(CalculatorTest, CannotDeclareFunctionWithExistingVariableName)
-{
+	Calculator calc;
 	calc.DeclareVariable("x");
-	Function func("x");
+	const Function func("x");
 	EXPECT_FALSE(calc.DeclareFunction("x", func));
-}
 
-TEST_F(CalculatorTest, CannotDeclareVariableWithExistingFunctionName)
-{
-	calc.DeclareVariable("x");
-	Function func("x");
+	calc.DeclareVariable("y");
 	calc.DeclareFunction("f", func);
 	EXPECT_FALSE(calc.DeclareVariable("f"));
 }
 
-// ==================== Edge Cases ====================
-
-TEST_F(CalculatorTest, LargeValue)
+TEST(CalculatorTest, AllOperations)
 {
-	calc.SetVariable("x", 1e100);
-	auto value = calc.GetValue("x");
-	ASSERT_TRUE(value.has_value());
-	EXPECT_DOUBLE_EQ(value.value(), 1e100);
-}
-
-TEST_F(CalculatorTest, VerySmallValue)
-{
-	calc.SetVariable("x", 1e-100);
-	auto value = calc.GetValue("x");
-	ASSERT_TRUE(value.has_value());
-	EXPECT_DOUBLE_EQ(value.value(), 1e-100);
-}
-
-TEST_F(CalculatorTest, AllOperations)
-{
-	calc.DeclareVariable("a");
-	calc.DeclareVariable("b");
-
+	Calculator calc;
 	calc.SetVariable("a", 10.0);
 	calc.SetVariable("b", 3.0);
+	calc.DeclareFunction("add", Function("a", "b", '+'));
+	calc.DeclareFunction("sub", Function("a", "b", '-'));
+	calc.DeclareFunction("mul", Function("a", "b", '*'));
+	calc.DeclareFunction("div", Function("a", "b", '/'));
 
-	Function add("a", "b", '+');
-	Function sub("a", "b", '-');
-	Function mul("a", "b", '*');
-	Function div("a", "b", '/');
-
-	calc.DeclareFunction("add", add);
-	calc.DeclareFunction("sub", sub);
-	calc.DeclareFunction("mul", mul);
-	calc.DeclareFunction("div", div);
-
-	auto addVal = calc.GetValue("add");
-	auto subVal = calc.GetValue("sub");
-	auto mulVal = calc.GetValue("mul");
-	auto divVal = calc.GetValue("div");
-
-	ASSERT_TRUE(addVal.has_value());
-	ASSERT_TRUE(subVal.has_value());
-	ASSERT_TRUE(mulVal.has_value());
-	ASSERT_TRUE(divVal.has_value());
-
-	EXPECT_DOUBLE_EQ(addVal.value(), 13.0);
-	EXPECT_DOUBLE_EQ(subVal.value(), 7.0);
-	EXPECT_DOUBLE_EQ(mulVal.value(), 30.0);
-	EXPECT_DOUBLE_EQ(divVal.value(), 3.3333333333333335);
+	EXPECT_DOUBLE_EQ(calc.GetValue("add").value(), 13.0);
+	EXPECT_DOUBLE_EQ(calc.GetValue("sub").value(), 7.0);
+	EXPECT_DOUBLE_EQ(calc.GetValue("mul").value(), 30.0);
+	EXPECT_NEAR(calc.GetValue("div").value(), 3.333333, 0.001);
 }

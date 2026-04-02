@@ -1,16 +1,22 @@
 #pragma once
 
 #include "Calculator.h"
+
+#include <functional>
 #include <string>
+#include <unordered_map>
 
 class Parser
 {
 public:
 	explicit Parser(Calculator& calculator);
-	void Parse(const std::string& line);
+	void Parse(const std::string& line) const;
 
 private:
 	Calculator& m_calculator;
+	using CommandHandler = std::function<void(const std::string&)>;
+	std::unordered_map<std::string, CommandHandler> m_commands;
+	void RegisterCommands();
 
 	struct Assignment
 	{
@@ -33,11 +39,11 @@ private:
 	};
 	static OperatorInfo FindBinaryOperator(const std::string& expr);
 	static std::optional<Function> CreateUnaryFunction(const std::string& operand);
-	static std::optional<Function> CreateBinaryFunction(const std::string& expr, char op, size_t opPos) ;
+	static std::optional<Function> CreateBinaryFunction(const std::string& expr, char op, size_t opPos);
 	bool DeclareFunctionOrReport(const std::string& name, const Function& func) const;
 
 	void ParseVarCommand(const std::string& tail) const;
-	void ParseLetCommand(const std::string& tail);
+	void ParseLetCommand(const std::string& tail) const;
 	void ParseFnCommand(const std::string& tail) const;
 	void ParsePrintCommand(const std::string& tail) const;
 	static void ParseNumber(const std::string& str, double& outValue, bool& outSuccess);
