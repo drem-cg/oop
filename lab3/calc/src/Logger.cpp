@@ -1,6 +1,7 @@
 #include "Logger.h"
 
-std::ostream* Logger::m_output = &std::cerr;
+std::ostream* Logger::m_output = &std::clog;
+// TODO: инит логера с конкретным св-вом
 
 void Logger::Info(const std::string& message)
 {

@@ -4,7 +4,6 @@
 #include "Variable.h"
 #include <map>
 #include <optional>
-#include <set>
 #include <string>
 
 class Calculator
@@ -17,6 +16,7 @@ public:
 	void PrintVariables();
 	void PrintFunctions();
 
+	// TODO: узнать про стат. методы
 	static bool IsValidIdentifier(const std::string& name);
 
 private:
@@ -25,8 +25,6 @@ private:
 
 	static std::optional<double> ApplyOperation(char op, double left, double right, const std::string& funcName);
 	std::optional<double> GetOperandValue(const std::string& operandName);
-	std::optional<double> ComputeUnaryFunction(const Function& func);
-	std::optional<double> ComputeBinaryFunction(const Function& func);
 	std::optional<double> ComputeFunctionValue(const std::string& name);
 	bool IsNameExists(const std::string& name) const;
 };

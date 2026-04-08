@@ -1,0 +1,42 @@
+classDiagram
+    class IShape {
+        <<interface>>
+        +virtual double GetArea() const = 0
+        +virtual double GetPerimeter() const = 0
+        +virtual std::string ToString() const = 0
+        +virtual ~IShape() = default
+    }
+    class ICanvasDrawable {
+        <<interface>>
+        +virtual void Draw(ICanvas & canvas) const = 0
+    }
+    class ICanvas {
+        <<interface>>
+        +virtual void SetStrokeColor(uint32_t color) = 0
+        +virtual void SetFillColor(uint32_t color) = 0
+        +virtual void DrawLine(double x1, double y1, double x2, double y2) = 0
+        +virtual void DrawCircle(double cx, double cy, double r) = 0
+        +virtual void DrawEllipse(double cx, double cy, double rx, double ry) = 0
+        +virtual ~ICanvas() = default
+    }
+    class CShape {
+        <<abstract>>
+        #uint32_t m_strokeColor
+        #uint32_t m_fillColor
+        +double GetStrokeColor() const
+        +double GetFillColor() const
+        +virtual ~CShape() = default
+    }
+    class CRectangle
+    class CCircle
+    class CTriangle
+    class CEllipse
+
+    IShape <|.. CShape
+    IShape <|.. ICanvasDrawable
+    ICanvasDrawable <|.. CShape
+    CShape <|-- CRectangle
+    CShape <|-- CCircle
+    CShape <|-- CTriangle
+    CShape <|-- CEllipse
+    ICanvasDrawable ..> ICanvas : uses

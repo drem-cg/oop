@@ -58,6 +58,7 @@ bool Calculator::DeclareVariable(const std::string& name)
 
 	m_variables.emplace(name, Variable()); // создаем переменную внутри map без копий
 	// лучше чем с копией m_variables[name] = Variable();
+	// TODO: emplace
 	Logger::Info("Variable name: " + name);
 	return true;
 }
@@ -119,6 +120,7 @@ std::optional<double> Calculator::ComputeFunctionValue(const std::string& name)
 	const Function& func = funcIt->second;
 
 	const auto firstOp = GetValue(func.GetOperand1());
+	// TODO: GetOperand1 rename
 	if (!firstOp.has_value())
 	{
 		return std::nullopt;
@@ -162,7 +164,7 @@ std::optional<double> Calculator::GetOperandValue(const std::string& operandName
 	return std::nullopt;
 }
 
-std::optional<double> Calculator::ApplyOperation(char op, double left, double right, const std::string& funcName)
+std::optional<double> Calculator::ApplyOperation(const char op, const double left, const double right, const std::string& funcName)
 {
 	switch (op)
 	{

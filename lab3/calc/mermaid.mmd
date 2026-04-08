@@ -37,7 +37,7 @@ classDiagram
         +PrintVariables(): void
         +PrintFunctions(): void
         +IsValidIdentifier(const std:: string& name): bool
-        -ComputeFunctionValue(const std:: string& name, std:: set<std:: string>& visited): std:: optional<double>
+        -ComputeFunctionValue(const std:: string& name): std:: optional<double>
         -IsNameExists(const std:: string& name) const: bool
     }
 
@@ -57,6 +57,6 @@ classDiagram
     Logger ..> Function
     Logger ..> Calculator
     Logger ..> Parser
-    Calculator "1" *-- "0..*" Variable
-    Calculator "1" *-- "0..*" Function
-    Parser "1" --> "1" Calculator
+    Calculator *-- Variable
+    Calculator *-- Function
+    Parser --> Calculator

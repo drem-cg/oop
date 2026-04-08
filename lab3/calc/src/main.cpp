@@ -4,6 +4,9 @@
 #include <iostream>
 #include <string>
 
+// TODO: виды связи
+// TODO: убрать 1 к 1 и тд
+
 int main()
 {
 	Logger::Info("Calculator started");
