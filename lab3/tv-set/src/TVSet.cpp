@@ -1,6 +1,5 @@
 #include "TVSet.h"
 #include <algorithm>
-#include <cctype>
 
 TVSet::TVSet()
 	: m_isOn(false)

@@ -5,7 +5,7 @@
 int main()
 {
 	TVSet tv;
-	RemoteControl remote(tv, std::cin, std::cout);
+	const RemoteControl remote(tv, std::cin, std::cout);
 
 	while (remote.HandleCommand())
 	{

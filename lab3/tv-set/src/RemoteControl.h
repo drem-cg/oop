@@ -19,11 +19,9 @@ public:
 
 	RemoteControl(TVSet& tv, std::istream& input, std::ostream& output);
 
-	// ❗ Убран const — метод читает из m_input
 	bool HandleCommand() const;
 
 private:
-	// ❗ Убран const у всех — вызывают не-const методы m_tv и пишут в m_output
 	bool TurnOn(std::istream& args) const;
 	bool TurnOff(std::istream& args) const;
 	bool Info(std::istream& args) const;

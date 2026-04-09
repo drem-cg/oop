@@ -1,5 +1,4 @@
 classDiagram
-%% Интерфейс фигуры
     class IShape {
         <<interface>>
         +virtual double GetArea() const = 0
@@ -10,7 +9,6 @@ classDiagram
         +virtual~ IShape() = default
     }
 
-%% Абстрактная база (хранит только общие данные)
     class ShapeBase {
         <<abstract>>
         #uint32_t m_strokeColor
@@ -21,7 +19,6 @@ classDiagram
         +uint32_t GetFillColor() const override
     }
 
-%% Конкретные фигуры
     class Rectangle {
         -double m_x, m_y, m_width, m_height
         +Rectangle(double x, double y, double w, double h, uint32_t stroke, uint32_t fill)
@@ -54,7 +51,6 @@ classDiagram
         +std:: string ToString() const override
     }
 
-%% Утилиты бизнес-логики
     class ShapeParser {
         +std:: vector~std::shared_ptr~IShape~~ Parse(std:: istream& input)
     }
@@ -64,7 +60,6 @@ classDiagram
         +std:: shared_ptr~IShape~FindMinPerimeter(const std::vector~std::shared_ptr~IShape~~ & shapes)
     }
 
-%% Связи
     IShape <|.. ShapeBase
     ShapeBase <|-- Rectangle
     ShapeBase <|-- Circle
