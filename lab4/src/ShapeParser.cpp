@@ -110,7 +110,7 @@ std::vector<std::shared_ptr<IShape>> ShapeParser::Parse(std::istream& input)
 	{
 		lineNum++;
 
-		if (line.empty() || line[0] == '#')
+		if (line.empty())
 		{
 			continue;
 		}
