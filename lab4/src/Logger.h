@@ -2,7 +2,7 @@
 
 #include <string>
 
-enum class LogLevel
+enum class LogType
 {
 	Debug,
 	Info,
@@ -10,8 +10,8 @@ enum class LogLevel
 	Error
 };
 
-void LoggerInit(LogLevel minLevel = LogLevel::Info);
-void LogWrite(LogLevel level, const std::string& message);
+void LoggerInit(LogType defType = LogType::Info);
+void LogWrite(LogType type, const std::string& message);
 
 void LogDebug(const std::string& message);
 void LogInfo(const std::string& message);

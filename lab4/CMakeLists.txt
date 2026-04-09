@@ -6,10 +6,7 @@ add_compile_options(-march=x86-64 -mtune=generic)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
-
-if (NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Debug)
-endif ()
+set(CMAKE_BUILD_TYPE Debug)
 
 find_package(GTest REQUIRED)
 include_directories(${GTEST_INCLUDE_DIRS})
@@ -36,6 +33,7 @@ set(TEST_SOURCES
         src/ShapeParser.cpp
         src/ShapeAnalyzer.cpp
         tests/shape_test.cpp
+        tests/stdin_test.cpp
 )
 
 add_executable(shape_app ${APP_SOURCES})

@@ -24,7 +24,7 @@ void PrintShapeInfo(const std::string& title, const std::shared_ptr<IShape>& sha
 
 int main()
 {
-	LoggerInit(LogLevel::Info);
+	LoggerInit(LogType::Info);
 	LogInfo("Application started. Reading shapes from stdin...");
 
 	const std::vector<std::shared_ptr<IShape>> shapes = ShapeParser::Parse(std::cin);

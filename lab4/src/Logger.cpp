@@ -1,59 +1,46 @@
 #include "Logger.h"
+
 #include <iostream>
+#include <mutex>
 
 namespace
 {
-auto g_minLevel = LogLevel::Info;
+LogType defType = LogType::Info;
+} // namespace
+
+void LoggerInit(const LogType minLevel)
+{
+	defType = minLevel;
 }
 
-void LoggerInit(const LogLevel minLevel)
+void LogWrite(const LogType type, const std::string& message)
 {
-	g_minLevel = minLevel;
-}
-
-void LogWrite(const LogLevel level, const std::string& message)
-{
-	if (level < g_minLevel)
+	if (type < defType)
 	{
 		return;
 	}
 
 	const char* levelStr = nullptr;
-	switch (level)
+	switch (type)
 	{
-	case LogLevel::Debug:
+	case LogType::Debug:
 		levelStr = "DEBUG";
 		break;
-	case LogLevel::Info:
+	case LogType::Info:
 		levelStr = "INFO";
 		break;
-	case LogLevel::Warn:
+	case LogType::Warn:
 		levelStr = "WARN";
 		break;
-	case LogLevel::Error:
+	case LogType::Error:
 		levelStr = "ERROR";
 		break;
 	}
 
-	std::clog << "[" << levelStr << "] " << message << std::endl;
+	std::cout << "[" << levelStr << "] " << message << std::endl;
 }
 
-void LogDebug(const std::string& message)
-{
-	LogWrite(LogLevel::Debug, message);
-}
-
-void LogInfo(const std::string& message)
-{
-	LogWrite(LogLevel::Info, message);
-}
-
-void LogWarn(const std::string& message)
-{
-	LogWrite(LogLevel::Warn, message);
-}
-
-void LogError(const std::string& message)
-{
-	LogWrite(LogLevel::Error, message);
-}
+void LogDebug(const std::string& message) { LogWrite(LogType::Debug, message); }
+void LogInfo(const std::string& message) { LogWrite(LogType::Info, message); }
+void LogWarn(const std::string& message) { LogWrite(LogType::Warn, message); }
+void LogError(const std::string& message) { LogWrite(LogType::Error, message); }
