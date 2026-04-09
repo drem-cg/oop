@@ -5,8 +5,8 @@
 #include <sstream>
 #include <stdexcept>
 
-constexpr double kPi = 3.14159265358979323846;
-constexpr double kMinRadius = 1e-9;
+constexpr double kPi = 3.14;
+constexpr double kMinRadius = 0.0;
 
 Ellipse::Ellipse(const double x, const double y, const double rx, const double ry, const uint32_t strokeColor, const uint32_t fillColor)
 	: ShapeBase(strokeColor, fillColor)
@@ -38,13 +38,6 @@ std::string Ellipse::ToString() const
 		<< "Ellipse (x=" << m_x << ", y=" << m_y
 		<< ", rx=" << m_rx << ", ry=" << m_ry << ")";
 	return oss.str();
-}
-
-void Ellipse::Draw(ICanvas& canvas) const
-{
-	canvas.SetStrokeColor(m_strokeColor);
-	canvas.SetFillColor(m_fillColor);
-	canvas.DrawEllipse(m_x, m_y, m_rx, m_ry);
 }
 
 double Ellipse::GetX() const

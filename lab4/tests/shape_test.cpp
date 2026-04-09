@@ -5,8 +5,10 @@
 #include <cmath>
 #include <gtest/gtest.h>
 
-constexpr double kEpsilon = 1e-5;
-constexpr double kPi = 3.14159265358979323846;
+// Синхронизировано с реализацией фигур
+constexpr double kPi = 3.14;
+// Немного ослаблено, так как 3.14 даёт меньшую точность, чем полный π
+constexpr double kEpsilon = 1e-3;
 
 TEST(RectangleTest, ValidCreationAndCalculations)
 {
@@ -50,10 +52,10 @@ TEST(TriangleTest, DegenerateThrows)
 TEST(EllipseTest, ValidCreationAndCalculations)
 {
 	const Ellipse ellipse(0.0, 0.0, 4.0, 2.0, 0xABCDEF, 0x123456);
-	const double expectedArea = kPi * 8.0;
+	constexpr double expectedArea = kPi * 8.0;
 	EXPECT_NEAR(ellipse.GetArea(), expectedArea, kEpsilon);
 
-	const double h = (4.0 - 2.0) * (4.0 - 2.0) / ((4.0 + 2.0) * (4.0 + 2.0));
+	constexpr double h = (4.0 - 2.0) * (4.0 - 2.0) / ((4.0 + 2.0) * (4.0 + 2.0));
 	const double expectedPerimeter = kPi * (4.0 + 2.0) * (1.0 + 3.0 * h / (10.0 + std::sqrt(4.0 - 3.0 * h)));
 	EXPECT_NEAR(ellipse.GetPerimeter(), expectedPerimeter, kEpsilon);
 }

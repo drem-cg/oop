@@ -1,42 +1,74 @@
 classDiagram
+%% Интерфейс фигуры
     class IShape {
         <<interface>>
         +virtual double GetArea() const = 0
         +virtual double GetPerimeter() const = 0
-        +virtual std::string ToString() const = 0
-        +virtual ~IShape() = default
+        +virtual uint32_t GetStrokeColor() const = 0
+        +virtual uint32_t GetFillColor() const = 0
+        +virtual std:: string ToString() const = 0
+        +virtual~ IShape() = default
     }
-    class ICanvasDrawable {
-        <<interface>>
-        +virtual void Draw(ICanvas & canvas) const = 0
-    }
-    class ICanvas {
-        <<interface>>
-        +virtual void SetStrokeColor(uint32_t color) = 0
-        +virtual void SetFillColor(uint32_t color) = 0
-        +virtual void DrawLine(double x1, double y1, double x2, double y2) = 0
-        +virtual void DrawCircle(double cx, double cy, double r) = 0
-        +virtual void DrawEllipse(double cx, double cy, double rx, double ry) = 0
-        +virtual ~ICanvas() = default
-    }
-    class CShape {
+
+%% Абстрактная база (хранит только общие данные)
+    class ShapeBase {
         <<abstract>>
         #uint32_t m_strokeColor
         #uint32_t m_fillColor
-        +double GetStrokeColor() const
-        +double GetFillColor() const
-        +virtual ~CShape() = default
+        +ShapeBase(uint32_t strokeColor, uint32_t fillColor)
+        +virtual~ ShapeBase() override = default
+        +uint32_t GetStrokeColor() const override
+        +uint32_t GetFillColor() const override
     }
-    class CRectangle
-    class CCircle
-    class CTriangle
-    class CEllipse
 
-    IShape <|.. CShape
-    IShape <|.. ICanvasDrawable
-    ICanvasDrawable <|.. CShape
-    CShape <|-- CRectangle
-    CShape <|-- CCircle
-    CShape <|-- CTriangle
-    CShape <|-- CEllipse
-    ICanvasDrawable ..> ICanvas : uses
+%% Конкретные фигуры
+    class Rectangle {
+        -double m_x, m_y, m_width, m_height
+        +Rectangle(double x, double y, double w, double h, uint32_t stroke, uint32_t fill)
+        +double GetArea() const override
+        +double GetPerimeter() const override
+        +std:: string ToString() const override
+    }
+
+    class Circle {
+        -double m_x, m_y, m_radius
+        +Circle(double x, double y, double r, uint32_t stroke, uint32_t fill)
+        +double GetArea() const override
+        +double GetPerimeter() const override
+        +std:: string ToString() const override
+    }
+
+    class Triangle {
+        -double m_x1, m_y1, m_x2, m_y2, m_x3, m_y3
+        +Triangle(double x1, double y1, double x2, double y2, double x3, double y3, uint32_t stroke, uint32_t fill)
+        +double GetArea() const override
+        +double GetPerimeter() const override
+        +std:: string ToString() const override
+    }
+
+    class Ellipse {
+        -double m_x, m_y, m_rx, m_ry
+        +Ellipse(double x, double y, double rx, double ry, uint32_t stroke, uint32_t fill)
+        +double GetArea() const override
+        +double GetPerimeter() const override
+        +std:: string ToString() const override
+    }
+
+%% Утилиты бизнес-логики
+    class ShapeParser {
+        +std:: vector~std::shared_ptr~IShape~~ Parse(std:: istream& input)
+    }
+
+    class ShapeAnalyzer {
+        +std:: shared_ptr~IShape~FindMaxArea(const std::vector~std::shared_ptr~IShape~~ & shapes)
+        +std:: shared_ptr~IShape~FindMinPerimeter(const std::vector~std::shared_ptr~IShape~~ & shapes)
+    }
+
+%% Связи
+    IShape <|.. ShapeBase
+    ShapeBase <|-- Rectangle
+    ShapeBase <|-- Circle
+    ShapeBase <|-- Triangle
+    ShapeBase <|-- Ellipse
+    ShapeParser ..> IShape
+    ShapeAnalyzer ..> IShape

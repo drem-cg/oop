@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.14)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=x86-64 -mtune=generic")
 project(Lab4Shapes LANGUAGES CXX)
+
+add_compile_options(-march=x86-64 -mtune=generic)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -34,8 +35,7 @@ set(TEST_SOURCES
         src/Ellipse.cpp
         src/ShapeParser.cpp
         src/ShapeAnalyzer.cpp
-        tests/parser_test.cpp
-        tests/analyzer_test.cpp
+        tests/shape_test.cpp
 )
 
 add_executable(shape_app ${APP_SOURCES})

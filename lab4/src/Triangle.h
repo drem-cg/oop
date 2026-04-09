@@ -5,12 +5,6 @@ class Triangle : public ShapeBase
 {
 public:
 	Triangle(double x1, double y1, double x2, double y2, double x3, double y3, uint32_t strokeColor, uint32_t fillColor);
-	~Triangle() override = default;
-
-	[[nodiscard]] double GetArea() const override;
-	[[nodiscard]] double GetPerimeter() const override;
-	[[nodiscard]] std::string ToString() const override;
-	void Draw(ICanvas& canvas) const override;
 
 	[[nodiscard]] double GetX1() const;
 	[[nodiscard]] double GetY1() const;
@@ -18,6 +12,9 @@ public:
 	[[nodiscard]] double GetY2() const;
 	[[nodiscard]] double GetX3() const;
 	[[nodiscard]] double GetY3() const;
+	[[nodiscard]] double GetArea() const override;
+	[[nodiscard]] double GetPerimeter() const override;
+	[[nodiscard]] std::string ToString() const override;
 
 private:
 	double m_x1, m_y1;

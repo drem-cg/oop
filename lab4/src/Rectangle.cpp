@@ -4,7 +4,7 @@
 #include <sstream>
 #include <stdexcept>
 
-constexpr double kMinDimension = 1e-9;
+constexpr double kMinDimension = 0.0;
 
 Rectangle::Rectangle(const double x, const double y, const double width, const double height, const uint32_t strokeColor, const uint32_t fillColor)
 	: ShapeBase(strokeColor, fillColor)
@@ -15,10 +15,8 @@ Rectangle::Rectangle(const double x, const double y, const double width, const d
 {
 	if (m_width <= kMinDimension || m_height <= kMinDimension)
 	{
-		//LogError("Rectangle width and height must be positive");
 		throw std::invalid_argument("Rectangle dimensions must be positive");
 	}
-	//LogDebug("Rectangle created");
 }
 
 double Rectangle::GetArea() const { return m_width * m_height; }
@@ -31,18 +29,6 @@ std::string Rectangle::ToString() const
 		<< "Rectangle (x=" << m_x << ", y=" << m_y
 		<< ", w=" << m_width << ", h=" << m_height << ")";
 	return oss.str();
-}
-
-void Rectangle::Draw(ICanvas& canvas) const
-{
-	canvas.SetStrokeColor(m_strokeColor);
-	canvas.SetFillColor(m_fillColor);
-	const double x2 = m_x + m_width;
-	const double y2 = m_y + m_height;
-	canvas.DrawLine(m_x, m_y, x2, m_y);
-	canvas.DrawLine(x2, m_y, x2, y2);
-	canvas.DrawLine(x2, y2, m_x, y2);
-	canvas.DrawLine(m_x, y2, m_x, m_y);
 }
 
 double Rectangle::GetX() const

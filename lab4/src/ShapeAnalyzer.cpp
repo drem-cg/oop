@@ -13,7 +13,9 @@ std::shared_ptr<IShape> ShapeAnalyzer::FindMaxArea(const std::vector<std::shared
 	for (auto it = shapes.begin() + 1; it != shapes.end(); ++it)
 	{
 		if ((*it)->GetArea() > (*maxIt)->GetArea())
+		{
 			maxIt = it;
+		}
 	}
 	return *maxIt;
 }
@@ -30,7 +32,9 @@ std::shared_ptr<IShape> ShapeAnalyzer::FindMinPerimeter(const std::vector<std::s
 	for (auto it = shapes.begin() + 1; it != shapes.end(); ++it)
 	{
 		if ((*it)->GetPerimeter() < (*minIt)->GetPerimeter())
+		{
 			minIt = it;
+		}
 	}
 	return *minIt;
 }

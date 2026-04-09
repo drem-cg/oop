@@ -5,7 +5,7 @@
 #include <sstream>
 #include <stdexcept>
 
-constexpr double kMinArea = 1e-9;
+constexpr double kMinArea = 0.0;
 
 Triangle::Triangle(const double x1, const double y1, const double x2, const double y2, const double x3, const double y3, const uint32_t strokeColor, const uint32_t fillColor)
 	: ShapeBase(strokeColor, fillColor)
@@ -59,15 +59,6 @@ std::string Triangle::ToString() const
 		<< ", v2=(" << m_x2 << "," << m_y2 << ")"
 		<< ", v3=(" << m_x3 << "," << m_y3 << "))";
 	return oss.str();
-}
-
-void Triangle::Draw(ICanvas& canvas) const
-{
-	canvas.SetStrokeColor(m_strokeColor);
-	canvas.SetFillColor(m_fillColor);
-	canvas.DrawLine(m_x1, m_y1, m_x2, m_y2);
-	canvas.DrawLine(m_x2, m_y2, m_x3, m_y3);
-	canvas.DrawLine(m_x3, m_y3, m_x1, m_y1);
 }
 
 double Triangle::GetX1() const

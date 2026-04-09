@@ -1,11 +1,9 @@
 #include "ShapeBase.h"
-#include "Logger.h"
 
 ShapeBase::ShapeBase(const uint32_t strokeColor, const uint32_t fillColor)
 	: m_strokeColor(strokeColor)
 	, m_fillColor(fillColor)
 {
-	LogDebug("ShapeBase initialized");
 }
 
 uint32_t ShapeBase::GetStrokeColor() const

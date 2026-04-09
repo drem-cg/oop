@@ -7,7 +7,7 @@
 
 void PrintShapeInfo(const std::string& title, const std::shared_ptr<IShape>& shape)
 {
-	std::cout << "\n--- " << title << " ---" << std::endl;
+	std::cout << "\n" << title << std::endl;
 	if (!shape)
 	{
 		std::cout << "No shape found." << std::endl;
@@ -27,17 +27,14 @@ int main()
 	LoggerInit(LogLevel::Info);
 	LogInfo("Application started. Reading shapes from stdin...");
 
-	ShapeParser parser;
-	const std::vector<std::shared_ptr<IShape>> shapes = parser.Parse(std::cin);
+	const std::vector<std::shared_ptr<IShape>> shapes = ShapeParser::Parse(std::cin);
 
 	LogInfo("Successfully parsed " + std::to_string(shapes.size()) + " shapes.");
 
-	ShapeAnalyzer analyzer;
-	const auto maxAreaShape = analyzer.FindMaxArea(shapes);
-	const auto minPerimeterShape = analyzer.FindMinPerimeter(shapes);
+	const auto maxAreaShape = ShapeAnalyzer::FindMaxArea(shapes);
+	const auto minPerimeterShape = ShapeAnalyzer::FindMinPerimeter(shapes);
 
 	PrintShapeInfo("Max Area Shape", maxAreaShape);
 	PrintShapeInfo("Min Perimeter Shape", minPerimeterShape);
-
 	return 0;
 }
