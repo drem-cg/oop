@@ -58,7 +58,7 @@ TEST(EllipseTest, ValidCreationAndCalculations)
 	EXPECT_NEAR(ellipse.GetPerimeter(), expectedPerimeter, kEpsilon);
 }
 
-TEST(EllipseTest, InvalidRadiiThrows)
+TEST(EllipseTest, InvalidRadiusThrows)
 {
 	EXPECT_THROW(Ellipse(0, 0, 0.0, 2.0, 0, 0), std::invalid_argument);
 	EXPECT_THROW(Ellipse(0, 0, 5.0, -1.0, 0, 0), std::invalid_argument);
