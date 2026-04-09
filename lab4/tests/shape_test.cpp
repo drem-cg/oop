@@ -5,9 +5,7 @@
 #include <cmath>
 #include <gtest/gtest.h>
 
-// Синхронизировано с реализацией фигур
 constexpr double kPi = 3.14;
-// Немного ослаблено, так как 3.14 даёт меньшую точность, чем полный π
 constexpr double kEpsilon = 1e-3;
 
 TEST(RectangleTest, ValidCreationAndCalculations)
