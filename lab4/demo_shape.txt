@@ -1,0 +1,32 @@
+# Sky Background
+rectangle 0 0 800 600 87CEEB 87CEEB
+
+# Sun
+circle 700 80 50 FFD700 FFD700
+
+# House Body
+rectangle 200 250 500 450 8B4513 D2B48C
+
+# Door
+rectangle 320 320 380 450 654321 8B4513
+
+# Window 1
+rectangle 240 290 300 350 00008B ADD8E6
+
+# Window 2
+rectangle 400 290 460 350 00008B ADD8E6
+
+# Tree 1 Trunk
+rectangle 100 350 130 500 8B4513 8B4513
+
+# Tree 1 Leaves
+circle 115 300 60 228B22 228B22
+
+# Tree 2 Trunk
+rectangle 620 360 645 500 8B4513 8B4513
+
+# Tree 2 Leaves
+circle 632 320 55 006400 006400
+
+# Roof
+triangle 200 250 500 250 350 150 8B0000 FF0000

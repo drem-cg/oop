@@ -1,3 +1,5 @@
+#include "Canvas/CCanvas.h"
+#include "Canvas/ICanvasDrawable.h"
 #include "ISolidShape.h"
 #include "Logger/Logger.h"
 #include "ShapeAnalyzer/ShapeAnalyzer.h"
@@ -48,6 +50,27 @@ int main()
 
 	PrintShapeInfo("Max Area Shape", maxAreaShape);
 	PrintShapeInfo("Min Perimeter Shape", minPerimeterShape);
+
+	if (!shapes.empty())
+	{
+		LogInfo("Creating visualization window...");
+
+		CCanvas canvas(800, 600, "Shapes Visualization");
+
+		canvas.BeginFrame();
+
+		for (const auto& shape : shapes)
+		{
+			if (const auto* drawable = dynamic_cast<ICanvasDrawable*>(shape.get()))
+			{
+				drawable->Draw(canvas);
+			}
+		}
+
+		LogInfo("Rendering complete. Close the window to exit.");
+
+		canvas.Display();
+	}
 
 	std::cout << std::flush;
 	return 0;
