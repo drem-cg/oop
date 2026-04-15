@@ -1,5 +1,5 @@
 #pragma once
-#include "IShape.h"
+#include "../IShape.h"
 
 #include <memory>
 #include <vector>

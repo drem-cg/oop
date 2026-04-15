@@ -1,13 +1,14 @@
-#include "Logger.h"
-#include "ShapeAnalyzer.h"
-#include "ShapeParser.h"
+#include "ISolidShape.h"
+#include "Logger/Logger.h"
+#include "ShapeAnalyzer/ShapeAnalyzer.h"
+#include "ShapeParser/ShapeParser.h"
 
 #include <iomanip>
 #include <iostream>
 
 void PrintShapeInfo(const std::string& title, const std::shared_ptr<IShape>& shape)
 {
-	std::cout << "\n" << title << std::endl;
+	std::cout << "\n--- " << title << " ---" << std::endl;
 	if (!shape)
 	{
 		std::cout << "No shape found." << std::endl;
@@ -17,8 +18,19 @@ void PrintShapeInfo(const std::string& title, const std::shared_ptr<IShape>& sha
 	std::cout << std::fixed << std::setprecision(2);
 	std::cout << "Area: " << shape->GetArea() << std::endl;
 	std::cout << "Perimeter: " << shape->GetPerimeter() << std::endl;
-	std::cout << "Stroke Color: #" << std::hex << std::setfill('0') << std::setw(6) << shape->GetStrokeColor() << std::dec << std::endl;
-	std::cout << "Fill Color:   #" << std::hex << std::setfill('0') << std::setw(6) << shape->GetFillColor() << std::dec << std::endl;
+	std::cout << "Outline Color: #" << std::hex << std::setfill('0') << std::setw(6)
+			  << shape->GetOutlineColor() << std::dec << std::endl;
+
+	if (auto* solid = dynamic_cast<const ISolidShape*>(shape.get()))
+	{
+		std::cout << "Fill Color:    #" << std::hex << std::setfill('0') << std::setw(6)
+				  << solid->GetFillColor() << std::dec << std::endl;
+	}
+	else
+	{
+		std::cout << "Fill Color:    N/A (non-solid shape)" << std::endl;
+	}
+
 	std::cout << "Details: " << shape->ToString() << std::endl;
 }
 
@@ -36,5 +48,7 @@ int main()
 
 	PrintShapeInfo("Max Area Shape", maxAreaShape);
 	PrintShapeInfo("Min Perimeter Shape", minPerimeterShape);
+
+	std::cout << std::flush;
 	return 0;
 }

@@ -1,5 +1,5 @@
 #include "ShapeAnalyzer.h"
-#include "Logger.h"
+#include "../Logger/Logger.h"
 
 std::shared_ptr<IShape> ShapeAnalyzer::FindMaxArea(const std::vector<std::shared_ptr<IShape>>& shapes)
 {
