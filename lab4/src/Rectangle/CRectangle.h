@@ -2,10 +2,12 @@
 #include "../Canvas/ICanvas.h"
 #include "../ISolidShape.h"
 #include "../Point/CPoint.h"
+#include "Canvas/ICanvasDrawable.h"
 
 #include <cstdint>
 
 class CRectangle : public ISolidShape
+	, public ICanvasDrawable
 {
 public:
 	CRectangle(CPoint leftTop, CPoint rightBottom, uint32_t outlineColor, uint32_t fillColor);

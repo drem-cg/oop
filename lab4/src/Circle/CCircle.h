@@ -5,6 +5,7 @@
 #include <cstdint>
 
 class CCircle : public ISolidShape
+	, public ICanvasDrawable
 {
 public:
 	CCircle(CPoint center, double radius, uint32_t outlineColor, uint32_t fillColor);
