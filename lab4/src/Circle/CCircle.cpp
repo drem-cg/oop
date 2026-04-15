@@ -6,8 +6,11 @@
 #include <sstream>
 #include <stdexcept>
 
+namespace
+{
 constexpr double kPi = 3.14;
 constexpr double kMinRadius = 0.0;
+} // namespace
 
 CCircle::CCircle(const CPoint center, const double radius, const uint32_t outlineColor, const uint32_t fillColor)
 	: m_center(center)

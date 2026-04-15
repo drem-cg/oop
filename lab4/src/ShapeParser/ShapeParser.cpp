@@ -1,4 +1,5 @@
-#include "../ShapeParser/ShapeParser.h"
+#include "ShapeParser.h"
+
 #include "../Circle/CCircle.h"
 #include "../LineSegment/CLineSegment.h"
 #include "../Logger/Logger.h"
@@ -42,7 +43,7 @@ std::pair<uint32_t, uint32_t> ParseSolidColors(std::istringstream& iss)
 	return { ParseHexColor(outlineHex), ParseHexColor(fillHex) };
 }
 
-uint32_t ParseOutlineOnly(std::istringstream& iss)
+uint32_t ParseOutlineColor(std::istringstream& iss)
 {
 	std::string outlineHex;
 	if (!(iss >> outlineHex))
@@ -52,96 +53,113 @@ uint32_t ParseOutlineOnly(std::istringstream& iss)
 	return ParseHexColor(outlineHex);
 }
 
-std::shared_ptr<IShape> ParseLine(std::istringstream& iss)
+std::shared_ptr<IShape> ParseLineSegment(std::istringstream& iss)
 {
 	double x1, y1, x2, y2;
 	if (!(iss >> x1 >> y1 >> x2 >> y2))
 	{
 		throw std::invalid_argument("Missing line parameters");
 	}
-	return std::make_shared<CLineSegment>(CPoint{ x1, y1 }, CPoint{ x2, y2 }, ParseOutlineOnly(iss));
+	const uint32_t color = ParseOutlineColor(iss);
+	return std::make_shared<CLineSegment>(CPoint{ x1, y1 }, CPoint{ x2, y2 }, color);
 }
 
-std::shared_ptr<IShape> ParseRectangle(std::istringstream& iss)
+std::shared_ptr<IShape> ParseRectangleShape(std::istringstream& iss)
 {
 	double x1, y1, x2, y2;
 	if (!(iss >> x1 >> y1 >> x2 >> y2))
 	{
 		throw std::invalid_argument("Missing rectangle parameters");
 	}
-	auto [outline, fill] = ParseSolidColors(iss);
+	const auto [outline, fill] = ParseSolidColors(iss);
 	return std::make_shared<CRectangle>(CPoint{ x1, y1 }, CPoint{ x2, y2 }, outline, fill);
 }
 
-std::shared_ptr<IShape> ParseCircle(std::istringstream& iss)
+std::shared_ptr<IShape> ParseCircleShape(std::istringstream& iss)
 {
-	double cx, cy, r;
-	if (!(iss >> cx >> cy >> r))
+	double cx, cy, radius;
+	if (!(iss >> cx >> cy >> radius))
 	{
 		throw std::invalid_argument("Missing circle parameters");
 	}
-	auto [outline, fill] = ParseSolidColors(iss);
-	return std::make_shared<CCircle>(CPoint{ cx, cy }, r, outline, fill);
+	const auto [outline, fill] = ParseSolidColors(iss);
+	return std::make_shared<CCircle>(CPoint{ cx, cy }, radius, outline, fill);
 }
 
-std::shared_ptr<IShape> ParseTriangle(std::istringstream& iss)
+std::shared_ptr<IShape> ParseTriangleShape(std::istringstream& iss)
 {
 	double x1, y1, x2, y2, x3, y3;
 	if (!(iss >> x1 >> y1 >> x2 >> y2 >> x3 >> y3))
 	{
 		throw std::invalid_argument("Missing triangle parameters");
 	}
-	auto [outline, fill] = ParseSolidColors(iss);
+	const auto [outline, fill] = ParseSolidColors(iss);
 	return std::make_shared<CTriangle>(CPoint{ x1, y1 }, CPoint{ x2, y2 }, CPoint{ x3, y3 }, outline, fill);
 }
 
-std::shared_ptr<IShape> ParseShape(const std::string& type, std::istringstream& iss)
+std::shared_ptr<IShape> CreateShape(const std::string& type, std::istringstream& iss)
 {
 	if (type == "line")
-		return ParseLine(iss);
+		return ParseLineSegment(iss);
 	if (type == "rectangle")
-		return ParseRectangle(iss);
+		return ParseRectangleShape(iss);
 	if (type == "circle")
-		return ParseCircle(iss);
+		return ParseCircleShape(iss);
 	if (type == "triangle")
-		return ParseTriangle(iss);
+		return ParseTriangleShape(iss);
 	return nullptr;
 }
+
+bool IsEmptyLine(const std::string& line)
+{
+	return line.empty();
+}
+
+bool ExtractShapeType(std::istringstream& iss, std::string& outType)
+{
+	return (iss >> outType).get();
+}
+
 } // namespace
 
 std::vector<std::shared_ptr<IShape>> ShapeParser::Parse(std::istream& input)
 {
 	std::vector<std::shared_ptr<IShape>> shapes;
 	std::string line;
-	int lineNum = 0;
+	int lineNumber = 0;
 
 	while (std::getline(input, line))
 	{
-		lineNum++;
-		if (line.empty() || line[0] == '#')
-			continue;
+		lineNumber++;
 
-		std::istringstream iss(line);
-		std::string type;
-		if (!(iss >> type))
+		if (IsEmptyLine(line))
+		{
+			continue;
+		}
+
+		std::istringstream lineStream(line);
+		std::string shapeType;
+
+		if (!ExtractShapeType(lineStream, shapeType))
 		{
 			continue;
 		}
 
 		try
 		{
-			auto shape = ParseShape(type, iss);
+			auto shape = CreateShape(shapeType, lineStream);
 			if (!shape)
 			{
-				LogWarn("Unknown shape type at line " + std::to_string(lineNum));
+				LogWarn("Unknown shape type at line " + std::to_string(lineNumber));
 				continue;
 			}
 			shapes.emplace_back(shape);
 		}
 		catch (const std::exception& e)
 		{
-			LogError("Failed to parse line " + std::to_string(lineNum) + ": " + e.what());
+			LogError("Failed to parse line " + std::to_string(lineNumber) + ": " + e.what());
 		}
 	}
+
 	return shapes;
 }

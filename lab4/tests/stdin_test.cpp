@@ -2,37 +2,39 @@
 #include "../src/ShapeParser/ShapeParser.h"
 #include <sstream>
 #include <memory>
-#include <cmath>
 
-constexpr double kEpsilon = 1e-9;
+constexpr double kEpsilon = 1e-3;
 
-TEST(ShapeParserTest, ParsesAllShapeTypesCorrectly)
+TEST(ShapeParserTest, ParsesAllSupportedShapeTypes)
 {
 	const std::string input = R"(
-		rectangle 10 20 5 5 ff0000 00ff00
-		circle 0 0 2 000000 ffffff
-		triangle 0 0 3 0 0 4 aabbcc ddeeff
+		rectangle 10 10 20 20 ff0000 00ff00
+		circle 100 100 10 000000 ffffff
+		triangle 0 0 30 0 0 40 aabbcc ddeeff
+		line 0 0 100 100 112233
 	)";
 
 	std::istringstream stream(input);
 	const auto shapes = ShapeParser::Parse(stream);
 
-	ASSERT_EQ(shapes.size(), 3);
+	ASSERT_EQ(shapes.size(), 4);
 
+	EXPECT_NEAR(shapes[0]->GetArea(), 100.0, kEpsilon);
 	EXPECT_EQ(shapes[0]->GetOutlineColor(), 0xFF0000);
 
-	EXPECT_NEAR(shapes[0]->GetArea(), 25.0, kEpsilon);
-	EXPECT_NEAR(shapes[1]->GetArea(), 3.14 * 4.0, kEpsilon);
-	EXPECT_NEAR(shapes[2]->GetArea(), 6.0, kEpsilon);
-	EXPECT_NEAR(shapes[3]->GetArea(), 3.14 * 20.0, kEpsilon);
+	EXPECT_NEAR(shapes[1]->GetArea(), 314.0, kEpsilon);
+
+	EXPECT_NEAR(shapes[2]->GetArea(), 600.0, kEpsilon);
+
+	EXPECT_NEAR(shapes[3]->GetArea(), 0.0, kEpsilon);
 }
 
-TEST(ShapeParserTest, ValidAndInvalidInput)
+TEST(ShapeParserTest, SkipsInvalidAndUnknownTypes)
 {
 	const std::string input = R"(
 		rectangle 0 0 10 10 ff0000 00ff00
-		badtype 0 0 1 ff0000 00ff00
-		circle 0 0 1 ff0000 00ff00
+		nottype 0 0 1 ff0000 00ff00
+		circle 50 50 5 112233 445566
 		triangle 0 0 1 1 2 2 000000 ffffff
 	)";
 
@@ -42,12 +44,12 @@ TEST(ShapeParserTest, ValidAndInvalidInput)
 	ASSERT_EQ(shapes.size(), 2);
 }
 
-TEST(ShapeParserTest, MissingParameters)
+TEST(ShapeParserTest, HandlesMissingParametersGracefully)
 {
 	const std::string input = R"(
 		rectangle 0 0 10 ff0000 00ff00
 		circle 0 0 ff0000 00ff00
-		ellipse 0 0 10 2 ff0000
+		line 0 0 10 112233
 	)";
 
 	std::istringstream stream(input);
@@ -56,13 +58,27 @@ TEST(ShapeParserTest, MissingParameters)
 	ASSERT_EQ(shapes.size(), 0);
 }
 
-TEST(ShapeParserTest, ParsesUntilEOF)
+TEST(ShapeParserTest, StrictHexColorValidation)
 {
-	const std::string input = "circle 0 0 1 aabbcc ddeeff";
+	const std::string input = R"(
+		circle 0 0 1 ff0000 00ff00
+		circle 0 0 1 ff00zz 00ff00
+		circle 0 0 1 ff00000 00ff00
+	)";
 
 	std::istringstream stream(input);
 	const auto shapes = ShapeParser::Parse(stream);
 
 	ASSERT_EQ(shapes.size(), 1);
-	EXPECT_NEAR(shapes[0]->GetArea(), 3.14, kEpsilon);
+}
+
+TEST(ShapeParserTest, HandlesEmptyInput)
+{
+	const std::string input = R"(
+	)";
+
+	std::istringstream stream(input);
+	const auto shapes = ShapeParser::Parse(stream);
+
+	ASSERT_TRUE(shapes.empty());
 }

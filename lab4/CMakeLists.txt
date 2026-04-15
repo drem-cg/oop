@@ -36,6 +36,8 @@ set(TEST_SOURCES
         src/Circle/CCircle.cpp
         tests/shape_test.cpp
         tests/canvas_drawable_test.cpp
+        tests/stdin_test.cpp
+        tests/stdin_test.cpp
 )
 
 add_executable(shape_app ${APP_SOURCES})

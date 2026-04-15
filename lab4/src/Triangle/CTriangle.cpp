@@ -8,7 +8,17 @@
 #include <stdexcept>
 #include <vector>
 
+namespace
+{
 constexpr double kMinArea = 1e-9;
+
+double CalculateDistance(const CPoint& p1, const CPoint& p2)
+{
+	const double dx = p2.x - p1.x;
+	const double dy = p2.y - p1.y;
+	return std::sqrt(dx * dx + dy * dy);
+}
+} // namespace
 
 CTriangle::CTriangle(const CPoint v1, const CPoint v2, const CPoint v3, const uint32_t outlineColor, const uint32_t fillColor)
 	: m_v1(v1)
@@ -16,11 +26,10 @@ CTriangle::CTriangle(const CPoint v1, const CPoint v2, const CPoint v3, const ui
 	, m_v3(v3)
 	, m_outlineColor(outlineColor)
 	, m_fillColor(fillColor)
-	, m_sideA(0.0)
-	, m_sideB(0.0)
-	, m_sideC(0.0)
+	, m_sideA(CalculateDistance(v1, v2))
+	, m_sideB(CalculateDistance(v2, v3))
+	, m_sideC(CalculateDistance(v3, v1))
 {
-	CalculateSides();
 	if (CTriangle::GetArea() <= kMinArea)
 	{
 		LogError("CTriangle is degenerate");
@@ -29,26 +38,15 @@ CTriangle::CTriangle(const CPoint v1, const CPoint v2, const CPoint v3, const ui
 	LogDebug("CTriangle created");
 }
 
-void CTriangle::CalculateSides()
-{
-	m_sideA = Distance(m_v1, m_v2);
-	m_sideB = Distance(m_v2, m_v3);
-	m_sideC = Distance(m_v3, m_v1);
-}
-
-double CTriangle::Distance(const CPoint p1, const CPoint p2)
-{
-	const double dx = p2.x - p1.x;
-	const double dy = p2.y - p1.y;
-	return std::sqrt(dx * dx + dy * dy);
-}
-
 double CTriangle::GetArea() const
 {
 	return 0.5 * std::abs((m_v2.x - m_v1.x) * (m_v3.y - m_v1.y) - (m_v3.x - m_v1.x) * (m_v2.y - m_v1.y));
 }
 
-double CTriangle::GetPerimeter() const { return m_sideA + m_sideB + m_sideC; }
+double CTriangle::GetPerimeter() const
+{
+	return m_sideA + m_sideB + m_sideC;
+}
 
 std::string CTriangle::ToString() const
 {

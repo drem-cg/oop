@@ -7,6 +7,14 @@
 
 #include <iomanip>
 #include <iostream>
+#include <memory>
+#include <vector>
+
+namespace
+{
+constexpr unsigned int kCanvasWidth = 800;
+constexpr unsigned int kCanvasHeight = 600;
+} // namespace
 
 void PrintShapeInfo(const std::string& title, const std::shared_ptr<IShape>& shape)
 {
@@ -23,7 +31,7 @@ void PrintShapeInfo(const std::string& title, const std::shared_ptr<IShape>& sha
 	std::cout << "Outline Color: #" << std::hex << std::setfill('0') << std::setw(6)
 			  << shape->GetOutlineColor() << std::dec << std::endl;
 
-	if (auto* solid = dynamic_cast<const ISolidShape*>(shape.get()))
+	if (const auto* solid = dynamic_cast<const ISolidShape*>(shape.get()))
 	{
 		std::cout << "Fill Color:    #" << std::hex << std::setfill('0') << std::setw(6)
 				  << solid->GetFillColor() << std::dec << std::endl;
@@ -36,14 +44,41 @@ void PrintShapeInfo(const std::string& title, const std::shared_ptr<IShape>& sha
 	std::cout << "Details: " << shape->ToString() << std::endl;
 }
 
+void RenderShapes(const std::vector<std::shared_ptr<IShape>>& shapes)
+{
+	if (shapes.empty())
+	{
+		return;
+	}
+
+	LogInfo("Creating visualization window...");
+	CCanvas canvas(kCanvasWidth, kCanvasHeight, "Shapes Visualization");
+
+	for (const auto& shape : shapes)
+	{
+		if (const auto* drawable = dynamic_cast<ICanvasDrawable*>(shape.get()))
+		{
+			drawable->Draw(canvas);
+		}
+	}
+
+	LogInfo("Rendering complete. Close the window to exit.");
+	canvas.Display();
+}
+
 int main()
 {
 	LoggerInit(LogType::Info);
 	LogInfo("Application started. Reading shapes from stdin...");
 
 	const std::vector<std::shared_ptr<IShape>> shapes = ShapeParser::Parse(std::cin);
-
 	LogInfo("Successfully parsed " + std::to_string(shapes.size()) + " shapes.");
+
+	if (shapes.empty())
+	{
+		LogWarn("No shapes to process. Exiting.");
+		return 0;
+	}
 
 	const auto maxAreaShape = ShapeAnalyzer::FindMaxArea(shapes);
 	const auto minPerimeterShape = ShapeAnalyzer::FindMinPerimeter(shapes);
@@ -51,27 +86,7 @@ int main()
 	PrintShapeInfo("Max Area Shape", maxAreaShape);
 	PrintShapeInfo("Min Perimeter Shape", minPerimeterShape);
 
-	if (!shapes.empty())
-	{
-		LogInfo("Creating visualization window...");
+	RenderShapes(shapes);
 
-		CCanvas canvas(800, 600, "Shapes Visualization");
-
-		canvas.BeginFrame();
-
-		for (const auto& shape : shapes)
-		{
-			if (const auto* drawable = dynamic_cast<ICanvasDrawable*>(shape.get()))
-			{
-				drawable->Draw(canvas);
-			}
-		}
-
-		LogInfo("Rendering complete. Close the window to exit.");
-
-		canvas.Display();
-	}
-
-	std::cout << std::flush;
 	return 0;
 }

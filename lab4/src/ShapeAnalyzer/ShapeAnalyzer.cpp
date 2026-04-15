@@ -1,5 +1,7 @@
 #include "ShapeAnalyzer.h"
-#include "../Logger/Logger.h"
+#include "Logger/Logger.h"
+
+#include <algorithm>
 
 std::shared_ptr<IShape> ShapeAnalyzer::FindMaxArea(const std::vector<std::shared_ptr<IShape>>& shapes)
 {
@@ -9,14 +11,11 @@ std::shared_ptr<IShape> ShapeAnalyzer::FindMaxArea(const std::vector<std::shared
 		return nullptr;
 	}
 
-	auto maxIt = shapes.begin();
-	for (auto it = shapes.begin() + 1; it != shapes.end(); ++it)
-	{
-		if ((*it)->GetArea() > (*maxIt)->GetArea())
-		{
-			maxIt = it;
-		}
-	}
+	const auto maxIt = std::max_element(shapes.begin(), shapes.end(),
+		[](const std::shared_ptr<IShape>& a, const std::shared_ptr<IShape>& b) {
+			return a->GetArea() < b->GetArea();
+		});
+
 	return *maxIt;
 }
 
@@ -28,13 +27,10 @@ std::shared_ptr<IShape> ShapeAnalyzer::FindMinPerimeter(const std::vector<std::s
 		return nullptr;
 	}
 
-	auto minIt = shapes.begin();
-	for (auto it = shapes.begin() + 1; it != shapes.end(); ++it)
-	{
-		if ((*it)->GetPerimeter() < (*minIt)->GetPerimeter())
-		{
-			minIt = it;
-		}
-	}
+	const auto minIt = std::min_element(shapes.begin(), shapes.end(),
+		[](const std::shared_ptr<IShape>& a, const std::shared_ptr<IShape>& b) {
+			return a->GetPerimeter() < b->GetPerimeter();
+		});
+
 	return *minIt;
 }

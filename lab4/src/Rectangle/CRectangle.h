@@ -11,7 +11,6 @@ class CRectangle : public ISolidShape
 {
 public:
 	CRectangle(CPoint leftTop, CPoint rightBottom, uint32_t outlineColor, uint32_t fillColor);
-	~CRectangle() override = default;
 
 	[[nodiscard]] double GetArea() const override;
 	[[nodiscard]] double GetPerimeter() const override;
@@ -23,7 +22,7 @@ public:
 	[[nodiscard]] double GetWidth() const;
 	[[nodiscard]] double GetHeight() const;
 
-	void Draw(ICanvas& canvas) const;
+	void Draw(ICanvas& canvas) const override;
 
 private:
 	CPoint m_leftTop;

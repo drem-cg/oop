@@ -9,7 +9,6 @@ class CCircle : public ISolidShape
 {
 public:
 	CCircle(CPoint center, double radius, uint32_t outlineColor, uint32_t fillColor);
-	~CCircle() override = default;
 
 	[[nodiscard]] double GetArea() const override;
 	[[nodiscard]] double GetPerimeter() const override;
@@ -19,7 +18,7 @@ public:
 	[[nodiscard]] CPoint GetCenter() const;
 	[[nodiscard]] double GetRadius() const;
 
-	void Draw(ICanvas& canvas) const;
+	void Draw(ICanvas& canvas) const override;
 
 private:
 	CPoint m_center;

@@ -5,6 +5,11 @@
 #include <sstream>
 #include <stdexcept>
 
+namespace
+{
+constexpr double kEpsilon = 1e-9;
+}
+
 CRectangle::CRectangle(const CPoint leftTop, const CPoint rightBottom, const uint32_t outlineColor, const uint32_t fillColor)
 	: m_leftTop(leftTop)
 	, m_rightBottom(rightBottom)
@@ -14,8 +19,7 @@ CRectangle::CRectangle(const CPoint leftTop, const CPoint rightBottom, const uin
 	m_width = std::abs(m_rightBottom.x - m_leftTop.x);
 	m_height = std::abs(m_rightBottom.y - m_leftTop.y);
 
-	// TODO: не забыть вынести
-	if (m_width <= 1e-9 || m_height <= 1e-9)
+	if (m_width <= kEpsilon || m_height <= kEpsilon)
 	{
 		LogError("CRectangle dimensions must be positive");
 		throw std::invalid_argument("CRectangle dimensions must be positive");
@@ -23,8 +27,15 @@ CRectangle::CRectangle(const CPoint leftTop, const CPoint rightBottom, const uin
 	LogDebug("CRectangle created");
 }
 
-double CRectangle::GetArea() const { return m_width * m_height; }
-double CRectangle::GetPerimeter() const { return 2.0 * (m_width + m_height); }
+double CRectangle::GetArea() const
+{
+	return m_width * m_height;
+}
+
+double CRectangle::GetPerimeter() const
+{
+	return 2.0 * (m_width + m_height);
+}
 
 std::string CRectangle::ToString() const
 {
