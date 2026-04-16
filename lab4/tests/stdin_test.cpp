@@ -44,7 +44,22 @@ TEST(ShapeParserTest, SkipsInvalidAndUnknownTypes)
 	ASSERT_EQ(shapes.size(), 2);
 }
 
-TEST(ShapeParserTest, HandlesMissingParametersGracefully)
+TEST(ShapeParserTest, IncorrectPosition)
+{
+	const std::string input = R"(
+		rectangle 0 0 10 10 ff0000 00ff00
+		rectangle -1 -1 1 ff0000 00ff00
+		circle 50 50 5 112233 445566
+		triangle 0 0 1 1 2 2 000000 ffffff
+	)";
+
+	std::istringstream stream(input);
+	const auto shapes = ShapeParser::Parse(stream);
+
+	ASSERT_EQ(shapes.size(), 2);
+}
+
+TEST(ShapeParserTest, MissingParameters)
 {
 	const std::string input = R"(
 		rectangle 0 0 10 ff0000 00ff00
@@ -72,7 +87,7 @@ TEST(ShapeParserTest, StrictHexColorValidation)
 	ASSERT_EQ(shapes.size(), 1);
 }
 
-TEST(ShapeParserTest, HandlesEmptyInput)
+TEST(ShapeParserTest, EmptyInput)
 {
 	const std::string input = R"(
 	)";

@@ -27,7 +27,9 @@ void CCanvas::DrawLine(const CPoint from, const CPoint to, const uint32_t lineCo
 void CCanvas::FillPolygon(const std::vector<CPoint>& points, const uint32_t fillColor)
 {
 	if (points.empty())
+	{
 		return;
+	}
 
 	sf::ConvexShape polygon(points.size());
 	for (size_t i = 0; i < points.size(); ++i)
@@ -41,7 +43,8 @@ void CCanvas::FillPolygon(const std::vector<CPoint>& points, const uint32_t fill
 void CCanvas::DrawCircle(const CPoint center, const double radius, const uint32_t lineColor)
 {
 	sf::CircleShape circle(static_cast<float>(radius));
-	circle.setPosition(static_cast<float>(center.x) - static_cast<float>(radius),
+	circle.setPosition(
+		static_cast<float>(center.x) - static_cast<float>(radius),
 		static_cast<float>(center.y) - static_cast<float>(radius));
 
 	circle.setFillColor(sf::Color::Transparent);
@@ -54,7 +57,8 @@ void CCanvas::DrawCircle(const CPoint center, const double radius, const uint32_
 void CCanvas::FillCircle(const CPoint center, const double radius, const uint32_t fillColor)
 {
 	sf::CircleShape circle(static_cast<float>(radius));
-	circle.setPosition(static_cast<float>(center.x) - static_cast<float>(radius),
+	circle.setPosition(
+		static_cast<float>(center.x) - static_cast<float>(radius),
 		static_cast<float>(center.y) - static_cast<float>(radius));
 
 	circle.setFillColor(ToSFMLColor(fillColor));

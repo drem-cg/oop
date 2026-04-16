@@ -62,15 +62,9 @@ TEST(CTriangleDrawTest, CallsFillPolygonAndThreeLines)
 
 	Verify(Method(mockCanvas, FillPolygon)).Once();
 
-	Verify(Method(mockCanvas, DrawLine)
-			   .Using(CPoint{ 0.0, 0.0 }, CPoint{ 3.0, 0.0 }, 0x111111))
-		.Once();
-	Verify(Method(mockCanvas, DrawLine)
-			   .Using(CPoint{ 3.0, 0.0 }, CPoint{ 0.0, 4.0 }, 0x111111))
-		.Once();
-	Verify(Method(mockCanvas, DrawLine)
-			   .Using(CPoint{ 0.0, 4.0 }, CPoint{ 0.0, 0.0 }, 0x111111))
-		.Once();
+	Verify(Method(mockCanvas, DrawLine).Using(CPoint{ 0.0, 0.0 }, CPoint{ 3.0, 0.0 }, 0x111111)).Once();
+	Verify(Method(mockCanvas, DrawLine).Using(CPoint{ 3.0, 0.0 }, CPoint{ 0.0, 4.0 }, 0x111111)).Once();
+	Verify(Method(mockCanvas, DrawLine).Using(CPoint{ 0.0, 4.0 }, CPoint{ 0.0, 0.0 }, 0x111111)).Once();
 
 	VerifyNoOtherInvocations(mockCanvas);
 }
