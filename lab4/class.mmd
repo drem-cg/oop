@@ -3,7 +3,7 @@ classDiagram
         <<struct>>
         +double x
         +double y
-        +bool operator==(const CPoint& other)
+        +bool operator==(const CPoint& other) const
     }
 
     class IShape {
@@ -11,8 +11,8 @@ classDiagram
         +virtual double GetArea() const = 0
         +virtual double GetPerimeter() const = 0
         +virtual uint32_t GetOutlineColor() const = 0
-        +virtual std::string ToString() const = 0
-        +virtual ~IShape() = default
+        +virtual std:: string ToString() const = 0
+        +virtual~ IShape() = default
     }
 
     class ISolidShape {
@@ -23,16 +23,16 @@ classDiagram
     class ICanvas {
         <<interface>>
         +virtual void DrawLine(CPoint from, CPoint to, uint32_t lineColor) = 0
-        +virtual void FillPolygon(const std::vector~CPoint~& points, uint32_t fillColor) = 0
+        +virtual void FillPolygon(const std:: vector~CPoint~ & points, uint32_t fillColor) = 0
         +virtual void DrawCircle(CPoint center, double radius, uint32_t lineColor) = 0
         +virtual void FillCircle(CPoint center, double radius, uint32_t fillColor) = 0
-        +virtual ~ICanvas() = default
+        +virtual~ ICanvas() = default
     }
 
     class ICanvasDrawable {
         <<interface>>
         +virtual void Draw(ICanvas& canvas) const = 0
-        +virtual ~ICanvasDrawable() = default
+        +virtual~ ICanvasDrawable() = default
     }
 
     class CLineSegment {
@@ -40,9 +40,9 @@ classDiagram
         -CPoint m_end
         -uint32_t m_outlineColor
         +CLineSegment(CPoint, CPoint, uint32_t)
-        +double GetArea() override
-        +double GetPerimeter() override
-        +uint32_t GetOutlineColor() override
+        +double GetArea() const override
+        +double GetPerimeter() const override
+        +uint32_t GetOutlineColor() const override
     }
 
     class CRectangle {
@@ -51,11 +51,11 @@ classDiagram
         -uint32_t m_outlineColor
         -uint32_t m_fillColor
         +CRectangle(CPoint, CPoint, uint32_t, uint32_t)
-        +double GetArea() override
-        +double GetPerimeter() override
-        +uint32_t GetOutlineColor() override
-        +uint32_t GetFillColor() override
-        +void Draw(ICanvas& canvas) override
+        +double GetArea() const override
+        +double GetPerimeter() const override
+        +uint32_t GetOutlineColor() const override
+        +uint32_t GetFillColor() const override
+        +void Draw(ICanvas& canvas) const override
     }
 
     class CCircle {
@@ -64,11 +64,11 @@ classDiagram
         -uint32_t m_outlineColor
         -uint32_t m_fillColor
         +CCircle(CPoint, double, uint32_t, uint32_t)
-        +double GetArea() override
-        +double GetPerimeter() override
-        +uint32_t GetOutlineColor() override
-        +uint32_t GetFillColor() override
-        +void Draw(ICanvas& canvas) override
+        +double GetArea() const override
+        +double GetPerimeter() const override
+        +uint32_t GetOutlineColor() const override
+        +uint32_t GetFillColor() const override
+        +void Draw(ICanvas& canvas) const override
     }
 
     class CTriangle {
@@ -78,47 +78,44 @@ classDiagram
         -uint32_t m_outlineColor
         -uint32_t m_fillColor
         +CTriangle(CPoint, CPoint, CPoint, uint32_t, uint32_t)
-        +double GetArea() override
-        +double GetPerimeter() override
-        +uint32_t GetOutlineColor() override
-        +uint32_t GetFillColor() override
-        +void Draw(ICanvas& canvas) override
+        +double GetArea() const override
+        +double GetPerimeter() const override
+        +uint32_t GetOutlineColor() const override
+        +uint32_t GetFillColor() const override
+        +void Draw(ICanvas& canvas) const override
     }
 
     class CCanvas {
-        -sf::RenderWindow m_window
-        +CCanvas(double, double, const std::string&)
+        -sf:: RenderWindow m_window
+        +CCanvas(double, double, const std:: string&)
         +void DrawLine(CPoint, CPoint, uint32_t) override
-        +void FillPolygon(...) override
-        +void DrawCircle(...) override
-        +void FillCircle(...) override
+        +void FillPolygon(const std:: vector~CPoint~ &, uint32_t) override
+        +void DrawCircle(CPoint, double, uint32_t) override
+        +void FillCircle(CPoint, double, uint32_t) override
         +void Display()
     }
 
     class ShapeParser {
-        +static std::vector~std::shared_ptr~IShape~~ Parse(std::istream& input)
+        +static std:: vector~std::shared_ptr~IShape~~ Parse(std:: istream&)
     }
 
     class ShapeAnalyzer {
-        +static std::shared_ptr~IShape~ FindMaxArea(const vector~shared_ptr~IShape~~&)
-        +static std::shared_ptr~IShape~ FindMinPerimeter(const vector~shared_ptr~IShape~~&)
+        +static std:: shared_ptr~IShape~FindMaxArea(const std::vector~std::shared_ptr~IShape~~ &)
+        +static std:: shared_ptr~IShape~FindMinPerimeter(const std::vector~std::shared_ptr~IShape~~ &)
     }
 
-    IShape <|-- ISolidShape : inheritance
+    IShape <|-- ISolidShape
     ISolidShape <|-- CRectangle
     ISolidShape <|-- CCircle
     ISolidShape <|-- CTriangle
     IShape <|-- CLineSegment
-
-    ICanvasDrawable <|.. CRectangle : implements
-    ICanvasDrawable <|.. CCircle : implements
-    ICanvasDrawable <|.. CTriangle : implements
-
-    ICanvas <|.. CCanvas : implements
-
-    ShapeParser ..> CLineSegment : creates
-    ShapeParser ..> CRectangle : creates
-    ShapeParser ..> CCircle : creates
-    ShapeParser ..> CTriangle : creates
-
-    ShapeAnalyzer ..> IShape : analyzes
+    ICanvasDrawable <|.. CRectangle
+    ICanvasDrawable <|.. CCircle
+    ICanvasDrawable <|.. CTriangle
+    ICanvas <|.. CCanvas
+    CLineSegment *-- CPoint
+    CRectangle *-- CPoint
+    CCircle *-- CPoint
+    CTriangle *-- CPoint
+    ShapeParser ..> IShape
+    ShapeAnalyzer ..> IShape
