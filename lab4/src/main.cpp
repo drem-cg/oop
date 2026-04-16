@@ -28,7 +28,7 @@ void PrintShapeInfo(const std::string& title, const std::shared_ptr<IShape>& sha
 	std::cout << std::fixed << std::setprecision(2);
 	std::cout << "Area: " << shape->GetArea() << std::endl;
 	std::cout << "Perimeter: " << shape->GetPerimeter() << std::endl;
-	std::cout << "Outline Color: #" << std::hex << std::setfill('0') << std::setw(6)
+	std::cout << "Outline Color: #" << std::hex << std::setw(6)
 			  << shape->GetOutlineColor() << std::dec << std::endl;
 
 	if (const auto* solid = dynamic_cast<const ISolidShape*>(shape.get()))
