@@ -14,6 +14,7 @@ public:
 	void FillCircle(CPoint center, double radius, uint32_t fillColor) override;
 	void BeginFrame();
 	void Display();
+
 private:
 	sf::RenderWindow m_window;
 	static sf::Color ToSFMLColor(uint32_t color);

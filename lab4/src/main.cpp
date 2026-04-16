@@ -33,12 +33,12 @@ void PrintShapeInfo(const std::string& title, const std::shared_ptr<IShape>& sha
 
 	if (const auto* solid = dynamic_cast<const ISolidShape*>(shape.get()))
 	{
-		std::cout << "Fill Color:    #" << std::hex << std::setfill('0') << std::setw(6)
+		std::cout << "Fill Color: #" << std::hex << std::setfill('0') << std::setw(6)
 				  << solid->GetFillColor() << std::dec << std::endl;
 	}
 	else
 	{
-		std::cout << "Fill Color:    N/A (non-solid shape)" << std::endl;
+		std::cout << "Fill Color: undefined (non solid shape)" << std::endl;
 	}
 
 	std::cout << "Details: " << shape->ToString() << std::endl;
@@ -51,7 +51,7 @@ void RenderShapes(const std::vector<std::shared_ptr<IShape>>& shapes)
 		return;
 	}
 
-	LogInfo("Creating visualization window...");
+	LogInfo("Creating visualization window");
 	CCanvas canvas(kCanvasWidth, kCanvasHeight, "Shapes Visualization");
 
 	for (const auto& shape : shapes)
@@ -69,7 +69,7 @@ void RenderShapes(const std::vector<std::shared_ptr<IShape>>& shapes)
 int main()
 {
 	LoggerInit(LogType::Info);
-	LogInfo("Application started. Reading shapes from stdin...");
+	LogInfo("Application started. Reading shapes...");
 
 	const std::vector<std::shared_ptr<IShape>> shapes = ShapeParser::Parse(std::cin);
 	LogInfo("Successfully parsed " + std::to_string(shapes.size()) + " shapes.");
