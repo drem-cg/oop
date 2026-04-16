@@ -78,15 +78,21 @@ double CRectangle::GetHeight() const
 
 void CRectangle::Draw(ICanvas& canvas) const
 {
-	const std::vector polygon = {
-		m_leftTop,
-		CPoint{ m_leftTop.x + m_width, m_leftTop.y },
-		m_rightBottom,
-		CPoint{ m_leftTop.x, m_rightBottom.y }
+	const double x1 = m_leftTop.x;
+	const double y1 = m_leftTop.y;
+	const double x2 = m_leftTop.x + m_width;
+	const double y2 = m_leftTop.y + m_height;
+
+	const std::vector<CPoint> polygon = {
+		CPoint{ x1, y1 },
+		CPoint{ x2, y1 },
+		CPoint{ x2, y2 },
+		CPoint{ x1, y2 }
 	};
 	canvas.FillPolygon(polygon, m_fillColor);
-	canvas.DrawLine(m_leftTop, CPoint{ m_leftTop.x + m_width, m_leftTop.y }, m_outlineColor);
-	canvas.DrawLine(CPoint{ m_leftTop.x + m_width, m_leftTop.y }, m_rightBottom, m_outlineColor);
-	canvas.DrawLine(m_rightBottom, CPoint{ m_leftTop.x, m_rightBottom.y }, m_outlineColor);
-	canvas.DrawLine(CPoint{ m_leftTop.x, m_rightBottom.y }, m_leftTop, m_outlineColor);
+
+	canvas.DrawLine(CPoint{ x1, y1 }, CPoint{ x2, y1 }, m_outlineColor);
+	canvas.DrawLine(CPoint{ x2, y1 }, CPoint{ x2, y2 }, m_outlineColor);
+	canvas.DrawLine(CPoint{ x2, y2 }, CPoint{ x1, y2 }, m_outlineColor);
+	canvas.DrawLine(CPoint{ x1, y2 }, CPoint{ x1, y1 }, m_outlineColor);
 }
