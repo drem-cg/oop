@@ -83,7 +83,7 @@ void CRectangle::Draw(ICanvas& canvas) const
 	const double x2 = m_leftTop.x + m_width;
 	const double y2 = m_leftTop.y + m_height;
 
-	const std::vector<CPoint> polygon = {
+	const std::vector polygon = {
 		CPoint{ x1, y1 },
 		CPoint{ x2, y1 },
 		CPoint{ x2, y2 },
