@@ -14,6 +14,8 @@
 #include <string>
 #include <vector>
 
+// TODO: про static
+
 namespace
 {
 uint32_t ParseHexColor(const std::string& hex)

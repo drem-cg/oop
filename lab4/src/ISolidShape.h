@@ -1,6 +1,8 @@
 #pragma once
 #include "IShape.h"
 
+// TODO: вынести сюда m_color ..., в  ISolid вынести GetCOlor()
+
 class ISolidShape : public IShape
 {
 public:

@@ -56,6 +56,7 @@ void RenderShapes(const std::vector<std::shared_ptr<IShape>>& shapes)
 
 	for (const auto& shape : shapes)
 	{
+		// TODO избавиться от dynamic_cast
 		if (const auto* drawable = dynamic_cast<ICanvasDrawable*>(shape.get()))
 		{
 			drawable->Draw(canvas);

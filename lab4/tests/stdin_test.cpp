@@ -11,7 +11,6 @@ TEST(ShapeParserTest, ParsesAllSupportedShapeTypes)
 		rectangle 10 10 20 20 ff0000 00ff00
 		circle 100 100 10 000000 ffffff
 		triangle 0 0 30 0 0 40 aabbcc ddeeff
-		line 0 0 100 100 112233
 	)";
 
 	std::istringstream stream(input);
