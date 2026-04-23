@@ -236,17 +236,17 @@ bool operator<(const CDate& lhs, const CDate& rhs)
 
 bool operator>(const CDate& lhs, const CDate& rhs)
 {
-	return rhs < lhs;
+	return lhs.IsValid() && rhs.IsValid() && lhs.m_timestamp > rhs.m_timestamp;
 }
 
 bool operator<=(const CDate& lhs, const CDate& rhs)
 {
-	return !(lhs > rhs);
+	return lhs.IsValid() && rhs.IsValid() && lhs.m_timestamp <= rhs.m_timestamp;
 }
 
 bool operator>=(const CDate& lhs, const CDate& rhs)
 {
-	return !(lhs < rhs);
+	return lhs.IsValid() && rhs.IsValid() && lhs.m_timestamp >= rhs.m_timestamp;
 }
 
 std::ostream& operator<<(std::ostream& out, const CDate& date)
@@ -269,7 +269,9 @@ std::istream& operator>>(std::istream& in, CDate& date)
 {
 	std::string token;
 	if (!(in >> token))
+	{
 		return in;
+	}
 
 	if (token == "INVALID")
 	{

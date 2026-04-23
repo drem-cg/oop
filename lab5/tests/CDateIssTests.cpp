@@ -111,7 +111,7 @@ TEST(CDateInputTest, LeadingAndTrailingSpaces)
 TEST(CDateInputTest, StreamStateAfterFailure)
 {
 	CDate date;
-	std::istringstream input("wrong.format");
+	std::istringstream input("wrong.format.date");
 	input >> date;
 	EXPECT_TRUE(input.fail());
 

@@ -1,19 +1,19 @@
-#include "include/CDate.h"
-#include "include/Logger/Logger.h"
+#include "../lab4/src/Logger/Logger.h"
+#include "CDate.h"
+
 #include <iostream>
+
 int main()
 {
 	LoggerInit(LogType::Debug);
+	CDate date;
+	std::cin >> date;
 
-	CDate date(1, Month::January, 2024);
-	std::cout << "Start: " << date << '\n';
+	if (std::cin.fail())
+	{
+		return 1;
+	}
 
-	date += 60;
-	std::cout << "+60 days: " << date << '\n';
-
-	CDate other = date - 30;
-	std::cout << "-30 days: " << other << '\n';
-	std::cout << "Diff: " << (date - other) << " days\n";
-
+	std::cout << date << '\n';
 	return 0;
 }
