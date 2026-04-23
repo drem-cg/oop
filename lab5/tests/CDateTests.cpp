@@ -27,7 +27,7 @@ TEST(CDateTest, InvalidDayThrows)
 
 TEST(CDateTest, InvalidMonthThrows)
 {
-	EXPECT_THROW(CDate(1, Month(13), 2024), std::invalid_argument);
+	EXPECT_THROW(CDate(1, static_cast<Month>(13), 2024), std::invalid_argument);
 }
 
 TEST(CDateTest, YearBelow1970Throws)

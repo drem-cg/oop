@@ -277,18 +277,18 @@ std::ostream& operator<<(std::ostream& out, const CDate& date)
 	return out;
 }
 
-std::istream& operator>>(std::istream& in, CDate& date)
+std::istream& operator>>(std::istream& iss, CDate& date)
 {
 	std::string token;
-	if (!(in >> token))
+	if (!(iss >> token))
 	{
-		return in;
+		return iss;
 	}
 
 	if (token == "INVALID")
 	{
 		date.m_timestamp = CDate::INVALID_TIMESTAMP;
-		return in;
+		return iss;
 	}
 
 	unsigned day{}, month{}, year{};
@@ -308,16 +308,16 @@ std::istream& operator>>(std::istream& in, CDate& date)
 	if (!parseNumAndDot(day) || !parseNumAndDot(month))
 	{
 		LogWarn("invalid input format");
-		in.setstate(std::ios::failbit);
-		return in;
+		iss.setstate(std::ios::failbit);
+		return iss;
 	}
 
 	const auto res = std::from_chars(ptr, end, year);
 	if (res.ec != std::errc{} || res.ptr != end)
 	{
 		LogWarn("invalid input format");
-		in.setstate(std::ios::failbit);
-		return in;
+		iss.setstate(std::ios::failbit);
+		return iss;
 	}
 
 	try
@@ -327,8 +327,8 @@ std::istream& operator>>(std::istream& in, CDate& date)
 	catch (const std::invalid_argument&)
 	{
 		LogWarn("date out of valid range");
-		in.setstate(std::ios::failbit);
+		iss.setstate(std::ios::failbit);
 		date.m_timestamp = CDate::INVALID_TIMESTAMP;
 	}
-	return in;
+	return iss;
 }

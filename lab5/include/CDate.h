@@ -64,7 +64,7 @@ public:
 	friend bool operator>=(const CDate& lhs, const CDate& rhs);
 
 	friend std::ostream& operator<<(std::ostream& out, const CDate& date);
-	friend std::istream& operator>>(std::istream& in, CDate& date);
+	friend std::istream& operator>>(std::istream& iss, CDate& date);
 
 private:
 	static constexpr unsigned INVALID_TIMESTAMP = UINT_MAX;
