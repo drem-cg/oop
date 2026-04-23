@@ -16,7 +16,7 @@ constexpr int MONTH_CYCLE_FACTOR = 153;
 constexpr int MONTH_CYCLE_DIVISOR = 5;
 constexpr int MONTH_CYCLE_OFFSET = 2;
 
-constexpr unsigned char DAYS_IN_COMMON_MONTH[] = {
+constexpr unsigned char DAYS_IN_MONTH[] = {
 	31, 28, 31, 30, 31, 30,
 	31, 31, 30, 31, 30, 31
 };
@@ -74,7 +74,7 @@ constexpr unsigned DaysInMonth(Month month, const int year) noexcept
 {
 	if (month == Month::February && IsLeapYear(year))
 		return 29;
-	return DAYS_IN_COMMON_MONTH[static_cast<unsigned>(month) - 1];
+	return DAYS_IN_MONTH[static_cast<unsigned>(month) - 1];
 }
 
 bool IsValidDate(const unsigned day, Month month, const unsigned year) noexcept
@@ -96,8 +96,8 @@ CDate::CDate(const unsigned day, Month month, const unsigned year)
 {
 	if (!IsValidDate(day, month, year))
 	{
-		LogError("CDate: invalid date components");
-		throw std::invalid_argument("CDate: day/month/year out of valid range");
+		LogError("invalid date components");
+		throw std::invalid_argument("day/month/year out of valid range");
 	}
 	m_timestamp = static_cast<unsigned>(
 		DaysSinceEpochFromYMD(static_cast<int>(year), static_cast<unsigned>(month), day));
@@ -107,7 +107,7 @@ CDate::CDate(const unsigned timestamp)
 {
 	if (timestamp > MAX_TIMESTAMP)
 	{
-		LogWarn("CDate: timestamp exceeds maximum allowed value");
+		LogWarn("timestamp exceeds maximum allowed value");
 		m_timestamp = INVALID_TIMESTAMP;
 	}
 	else
@@ -123,17 +123,29 @@ bool CDate::IsValid() const
 
 unsigned CDate::GetDay() const
 {
-	return IsValid() ? TimestampToDateParts(m_timestamp).day : 0;
+	if (IsValid())
+	{
+		return TimestampToDateParts(m_timestamp).day;
+	}
+	return 0;
 }
 
 Month CDate::GetMonth() const
 {
-	return IsValid() ? TimestampToDateParts(m_timestamp).month : Month::January;
+	if (IsValid())
+	{
+		return TimestampToDateParts(m_timestamp).month;
+	}
+	return Month::January;
 }
 
 unsigned CDate::GetYear() const
 {
-	return IsValid() ? TimestampToDateParts(m_timestamp).year : 0;
+	if (IsValid())
+	{
+		return TimestampToDateParts(m_timestamp).year;
+	}
+	return 0;
 }
 
 WeekDay CDate::GetWeekDay() const
@@ -142,7 +154,7 @@ WeekDay CDate::GetWeekDay() const
 	{
 		return WeekDay::Sunday;
 	}
-
+	// + 4 т.к. четверг
 	return static_cast<WeekDay>((static_cast<int>(m_timestamp) + 4) % 7);
 }
 
@@ -178,7 +190,7 @@ CDate& CDate::operator+=(const int days)
 	const long long newTimestamp = static_cast<long long>(m_timestamp) + days;
 	if (newTimestamp < 0 || newTimestamp > static_cast<long long>(MAX_TIMESTAMP))
 	{
-		LogWarn("CDate: arithmetic operation out of valid date range");
+		LogWarn("operation out of valid date range");
 		m_timestamp = INVALID_TIMESTAMP;
 	}
 	else
@@ -295,7 +307,7 @@ std::istream& operator>>(std::istream& in, CDate& date)
 
 	if (!parseNumAndDot(day) || !parseNumAndDot(month))
 	{
-		LogWarn("CDate: invalid input format");
+		LogWarn("invalid input format");
 		in.setstate(std::ios::failbit);
 		return in;
 	}
@@ -303,7 +315,7 @@ std::istream& operator>>(std::istream& in, CDate& date)
 	const auto res = std::from_chars(ptr, end, year);
 	if (res.ec != std::errc{} || res.ptr != end)
 	{
-		LogWarn("CDate: invalid input format");
+		LogWarn("invalid input format");
 		in.setstate(std::ios::failbit);
 		return in;
 	}
@@ -314,7 +326,7 @@ std::istream& operator>>(std::istream& in, CDate& date)
 	}
 	catch (const std::invalid_argument&)
 	{
-		LogWarn("CDate: date out of valid range");
+		LogWarn("date out of valid range");
 		in.setstate(std::ios::failbit);
 		date.m_timestamp = CDate::INVALID_TIMESTAMP;
 	}
