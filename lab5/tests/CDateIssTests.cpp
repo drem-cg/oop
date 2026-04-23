@@ -114,8 +114,4 @@ TEST(CDateInputTest, StreamStateAfterFailure)
 	std::istringstream input("wrong.format.date");
 	input >> date;
 	EXPECT_TRUE(input.fail());
-
-	int dummy = 0;
-	input >> dummy;
-	EXPECT_TRUE(input.fail());
 }

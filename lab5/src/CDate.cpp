@@ -90,6 +90,40 @@ DateParts TimestampToDateParts(const unsigned timestamp) noexcept
 	return YMDFromDaysSinceEpoch(static_cast<int>(timestamp));
 }
 
+bool ParseUnsignedAndSkipDot(const char*& ptr, const char* end, unsigned& out) noexcept
+{
+	const auto res = std::from_chars(ptr, end, out);
+	if (res.ec != std::errc{} || res.ptr == ptr || res.ptr == end || *res.ptr != '.')
+	{
+		return false;
+	}
+	ptr = res.ptr + 1;
+	return true;
+}
+
+bool ParseLastUnsigned(const char* ptr, const char* end, unsigned& out) noexcept
+{
+	const auto res = std::from_chars(ptr, end, out);
+	return res.ec == std::errc{} && res.ptr == end;
+}
+
+bool TryParseDateToken(const std::string& token, unsigned& day, unsigned& month, unsigned& year) noexcept
+{
+	const char* ptr = token.data();
+	const char* end = ptr + token.size();
+
+	if (!ParseUnsignedAndSkipDot(ptr, end, day))
+		return false;
+
+	if (!ParseUnsignedAndSkipDot(ptr, end, month))
+		return false;
+
+	if (!ParseLastUnsigned(ptr, end, year))
+		return false;
+
+	return true;
+}
+
 } // namespace
 
 CDate::CDate(const unsigned day, Month month, const unsigned year)
@@ -269,11 +303,11 @@ std::ostream& operator<<(std::ostream& out, const CDate& date)
 		return out;
 	}
 
-	const auto parts = TimestampToDateParts(date.m_timestamp);
+	const auto [day, month, year] = TimestampToDateParts(date.m_timestamp);
 	out << std::setfill('0')
-		<< std::setw(2) << parts.day << '.'
-		<< std::setw(2) << static_cast<unsigned>(parts.month) << '.'
-		<< std::setw(4) << parts.year;
+		<< std::setw(2) << day << '.'
+		<< std::setw(2) << static_cast<unsigned>(month) << '.'
+		<< std::setw(4) << year;
 	return out;
 }
 
@@ -281,9 +315,7 @@ std::istream& operator>>(std::istream& iss, CDate& date)
 {
 	std::string token;
 	if (!(iss >> token))
-	{
 		return iss;
-	}
 
 	if (token == "INVALID")
 	{
@@ -292,30 +324,9 @@ std::istream& operator>>(std::istream& iss, CDate& date)
 	}
 
 	unsigned day{}, month{}, year{};
-	const char* ptr = token.data();
-	const char* end = ptr + token.size();
-
-	auto parseNumAndDot = [&ptr, end](unsigned& out) -> bool {
-		const auto res = std::from_chars(ptr, end, out);
-		if (res.ec != std::errc{} || res.ptr == ptr || res.ptr == end || *res.ptr != '.')
-		{
-			return false;
-		}
-		ptr = res.ptr + 1;
-		return true;
-	};
-
-	if (!parseNumAndDot(day) || !parseNumAndDot(month))
+	if (!TryParseDateToken(token, day, month, year))
 	{
-		LogWarn("invalid input format");
-		iss.setstate(std::ios::failbit);
-		return iss;
-	}
-
-	const auto res = std::from_chars(ptr, end, year);
-	if (res.ec != std::errc{} || res.ptr != end)
-	{
-		LogWarn("invalid input format");
+		LogWarn("CDate: invalid input format");
 		iss.setstate(std::ios::failbit);
 		return iss;
 	}
@@ -326,7 +337,7 @@ std::istream& operator>>(std::istream& iss, CDate& date)
 	}
 	catch (const std::invalid_argument&)
 	{
-		LogWarn("date out of valid range");
+		LogWarn("CDate: date out of valid range");
 		iss.setstate(std::ios::failbit);
 		date.m_timestamp = CDate::INVALID_TIMESTAMP;
 	}
