@@ -102,19 +102,19 @@ TEST(HttpUrlParser, DocumentPreservesCaseAndSpecialChars)
 
 TEST(HttpUrlParser, SubdomainAndLongDomain)
 {
-	const CHttpUrl url("http://sub.domain.example.com/path");
-	EXPECT_EQ(url.GetDomain(), "sub.domain.example.com");
+	const CHttpUrl url("http://sub.domain.example.test/path");
+	EXPECT_EQ(url.GetDomain(), "sub.domain.example.test");
 	EXPECT_EQ(url.GetDocument(), "/path");
 }
 
 TEST(HttpUrlParser, UrlWithOnlyProtocolAndDomain)
 {
-	const CHttpUrl url("https://secure.org");
+	const CHttpUrl url("https://secure.test");
 	EXPECT_EQ(url.GetProtocol(), Protocol::HTTPS);
-	EXPECT_EQ(url.GetDomain(), "secure.org");
+	EXPECT_EQ(url.GetDomain(), "secure.test");
 	EXPECT_EQ(url.GetPort(), 443);
 	EXPECT_EQ(url.GetDocument(), "/");
-	EXPECT_EQ(url.GetURL(), "https://secure.org/");
+	EXPECT_EQ(url.GetURL(), "https://secure.test/");
 }
 
 TEST(HttpUrlBoundary, PortBoundaryValues)
