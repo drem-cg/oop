@@ -121,7 +121,7 @@ unsigned CHttpUrl::ParsePortNumber(const std::string& portStr)
 {
 	try
 	{
-		const unsigned portNum = std::stoul(portStr);
+		const unsigned portNum = std::stoi(portStr);
 		if (portNum < MIN_PORT || portNum > MAX_PORT)
 		{
 			throw UrlParsingError("Port out of valid range from 1 to 65535");
