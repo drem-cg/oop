@@ -1,5 +1,5 @@
-#include "HttpUrl.h"
-#include "UrlParsingError.h"
+#include "../include/HttpUrl.h"
+#include "../include/UrlParsingError.h"
 #include <gtest/gtest.h>
 
 TEST(HttpUrlParser, ValidUrlsFromString)
