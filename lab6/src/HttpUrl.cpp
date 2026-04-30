@@ -100,13 +100,13 @@ CHttpUrl::CHttpUrl(const std::string& url)
 	const auto [protocol, hostAndPort, document] = SplitUrlIntoParts(url);
 	m_protocol = ParseProtocol(protocol);
 
-	const UrlStrParts auth = SplitUrlStrParts(hostAndPort);
-	m_domain = auth.domain;
+	const auto [domain, portStr, hasPort] = SplitUrlStrParts(hostAndPort);
+	m_domain = domain;
 	ValidateDomain(m_domain);
 
-	if (auth.hasPort)
+	if (hasPort)
 	{
-		m_port = ParsePortNumber(auth.portStr);
+		m_port = ParsePortNumber(portStr);
 	}
 	else
 	{
