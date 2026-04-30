@@ -77,27 +77,6 @@ UrlStrParts SplitUrlStrParts(const std::string& str)
 
 	return { str.substr(0, portSep), portStr, true };
 }
-
-unsigned ParsePortNumber(const std::string& portStr, const unsigned minPort, const unsigned maxPort)
-{
-	try
-	{
-		const unsigned long portNum = std::stoul(portStr);
-		if (portNum < minPort || portNum > maxPort)
-		{
-			throw UrlParsingError("Port out of valid range from 1 to 65535");
-		}
-		return portNum;
-	}
-	catch (const std::invalid_argument&)
-	{
-		throw UrlParsingError("Invalid port number format");
-	}
-	catch (const std::out_of_range&)
-	{
-		throw UrlParsingError("Port number is too large");
-	}
-}
 } // namespace
 
 CHttpUrl::CHttpUrl(const std::string& domain, const std::string& document, const Protocol protocol)
@@ -105,7 +84,7 @@ CHttpUrl::CHttpUrl(const std::string& domain, const std::string& document, const
 {
 }
 
-CHttpUrl::CHttpUrl(const std::string& domain, const std::string& document, const Protocol protocol, const unsigned short port)
+CHttpUrl::CHttpUrl(const std::string& domain, const std::string& document, const Protocol protocol, const unsigned port)
 	: m_protocol(protocol)
 	, m_domain(domain)
 	, m_document(document)
@@ -127,7 +106,7 @@ CHttpUrl::CHttpUrl(const std::string& url)
 
 	if (auth.hasPort)
 	{
-		m_port = ParsePortNumber(auth.portStr, MIN_PORT, MAX_PORT);
+		m_port = ParsePortNumber(auth.portStr);
 	}
 	else
 	{
@@ -136,6 +115,27 @@ CHttpUrl::CHttpUrl(const std::string& url)
 
 	m_document = document;
 	ValidateDocument(m_document);
+}
+
+unsigned CHttpUrl::ParsePortNumber(const std::string& portStr)
+{
+	try
+	{
+		const unsigned portNum = std::stoul(portStr);
+		if (portNum < MIN_PORT || portNum > MAX_PORT)
+		{
+			throw UrlParsingError("Port out of valid range from 1 to 65535");
+		}
+		return portNum;
+	}
+	catch (const std::invalid_argument&)
+	{
+		throw UrlParsingError("Invalid port number format");
+	}
+	catch (const std::out_of_range&)
+	{
+		throw UrlParsingError("Port number is too large");
+	}
 }
 
 void CHttpUrl::ValidateDomain(const std::string& domain)
@@ -155,7 +155,7 @@ void CHttpUrl::ValidateDocument(std::string& document)
 	EnsureLeadingSlash(document);
 }
 
-void CHttpUrl::ValidatePort(const unsigned short port)
+void CHttpUrl::ValidatePort(const unsigned port)
 {
 	if (port < MIN_PORT || port > MAX_PORT)
 	{
@@ -222,7 +222,7 @@ std::string CHttpUrl::GetProtocolString() const noexcept
 	return (m_protocol == Protocol::HTTP) ? "http" : "https";
 }
 
-unsigned short CHttpUrl::GetPort() const noexcept
+unsigned CHttpUrl::GetPort() const noexcept
 {
 	return m_port;
 }

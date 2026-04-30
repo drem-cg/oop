@@ -13,27 +13,28 @@ class CHttpUrl
 public:
 	explicit CHttpUrl(const std::string& url);
 	CHttpUrl(const std::string& domain, const std::string& document, Protocol protocol);
-	CHttpUrl(const std::string& domain, const std::string& document, Protocol protocol, unsigned short port);
+	CHttpUrl(const std::string& domain, const std::string& document, Protocol protocol, unsigned port);
 
 	[[nodiscard]] std::string GetURL() const;
 	[[nodiscard]] std::string GetDomain() const noexcept;
 	[[nodiscard]] std::string GetDocument() const noexcept;
 	[[nodiscard]] Protocol GetProtocol() const noexcept;
 	[[nodiscard]] std::string GetProtocolString() const noexcept;
-	[[nodiscard]] unsigned short GetPort() const noexcept;
+	[[nodiscard]] unsigned GetPort() const noexcept;
 
 private:
 	static void ValidateDomain(const std::string& domain);
 	static void ValidateDocument(std::string& document);
-	static void ValidatePort(unsigned short port);
+	static void ValidatePort(unsigned port);
 	static Protocol ParseProtocol(const std::string& protocolStr);
 	static unsigned GetDefaultPort(Protocol protocol) noexcept;
 	static std::string GetProtocolString(Protocol protocol) noexcept;
+	static unsigned ParsePortNumber(const std::string& portStr);
 
 	Protocol m_protocol;
 	std::string m_domain;
 	std::string m_document;
-	unsigned short m_port;
+	unsigned m_port;
 
 	static constexpr unsigned HTTP_DEFAULT_PORT = 80;
 	static constexpr unsigned HTTPS_DEFAULT_PORT = 443;

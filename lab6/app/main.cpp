@@ -17,11 +17,11 @@ int main()
 		{
 			CHttpUrl url(line);
 			std::clog << "[INFO] Parsed URL: " << line << "\n";
+			std::cout << "Full URL: " << url.GetURL() << "\n";
 			std::cout << "Protocol: " << url.GetProtocolString() << "\n";
 			std::cout << "Domain: " << url.GetDomain() << "\n";
 			std::cout << "Port: " << url.GetPort() << "\n";
 			std::cout << "Document: " << url.GetDocument() << "\n";
-			std::cout << "Full URL: " << url.GetURL() << "\n";
 		}
 		catch (const UrlParsingError& e)
 		{
